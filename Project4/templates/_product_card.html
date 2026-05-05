@@ -1,0 +1,17 @@
+<article class="card product-card">
+  <a href="{{ url_for('product_detail', product_id=product.g6_ProductID) }}">
+    <img class="product-img" src="{{ product.g6_ImageURL }}" alt="{{ product.g6_ProductName }}">
+  </a>
+  <div style="margin-top:18px">
+    <span class="tag">{{ product.g6_CategoryName }}</span>
+    <h3><a href="{{ url_for('product_detail', product_id=product.g6_ProductID) }}">{{ product.g6_ProductName }}</a></h3>
+    <p class="muted">{{ product.g6_BrandName or 'EduStore' }}</p>
+    <p class="price">💰 {{ product.g6_Price|vnd }}</p>
+    <p class="muted">📦 Kho: {{ product.g6_Stock }} {{ product.g6_Unit }}</p>
+    <form method="post" action="{{ url_for('add_to_cart', product_id=product.g6_ProductID) }}">
+      <label style="display:inline;font-weight:500">SL:</label>
+      <input type="number" name="quantity" min="1" max="{{ product.g6_Stock }}" value="1" style="max-width:90px;min-height:34px;padding:0 8px;border-radius:0">
+      <button class="btn" type="submit" style="width:100%;margin-top:14px">➕ Thêm vào giỏ</button>
+    </form>
+  </div>
+</article>

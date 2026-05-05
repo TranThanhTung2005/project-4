@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ product.g6_ProductName }}{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr)">
+  <img class="card product-img" src="{{ product.g6_ImageURL }}" alt="{{ product.g6_ProductName }}">
+  <section>
+    <p class="muted">{{ product.g6_SKU }} · {{ product.g6_CategoryName }} · {{ product.g6_BrandName or 'Không có thương hiệu' }}</p>
+    <h1>{{ product.g6_ProductName }}</h1>
+    <p>{{ product.g6_Description }}</p>
+    <p class="price">{{ product.g6_Price|vnd }}</p>
+    <p class="muted">Tồn kho: {{ product.g6_Stock }} {{ product.g6_Unit }}</p>
+    <form method="post" action="{{ url_for('add_to_cart', product_id=product.g6_ProductID) }}" class="row">
+      <input type="number" name="quantity" min="1" max="{{ product.g6_Stock }}" value="1" style="max-width:100px">
+      <button class="btn" type="submit">Thêm vào giỏ</button>
+    </form>
+  </section>
+</div>
+
+<h2 class="section-title">Đánh giá</h2>
+<div class="grid">
+  {% for review in reviews %}
+    <div class="panel card-body">
+      <strong>{{ review.g6_FullName }} · {{ review.g6_Rating }}/5</strong>
+      <p>{{ review.g6_Comment }}</p>
+    </div>
+  {% else %}
+    <p>Chưa có đánh giá.</p>
+  {% endfor %}
+</div>
+{% endblock %}

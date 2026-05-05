@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}EduStore - Dụng cụ học tập{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <div class="eyebrow">Danh sách sản phẩm</div>
+    <h1>Chọn nhanh những món đồ bạn cần cho buổi học tiếp theo</h1>
+  </div>
+  <a class="btn secondary" href="{{ url_for('cart') }}">Xem giỏ hàng</a>
+</section>
+
+<div class="grid product-grid">
+  {% for product in products %}
+    {% include "_product_card.html" %}
+  {% endfor %}
+</div>
+
+<h2 class="section-title">Danh mục</h2>
+<div class="grid">
+  {% for category in categories %}
+    <a class="panel card-body" href="{{ url_for('products', category=category.g6_CategoryID) }}">
+      <span class="eyebrow">{{ category.g6_Slug }}</span>
+      <h3>{{ category.g6_CategoryName }}</h3>
+      <p class="muted">{{ category.g6_Description }}</p>
+    </a>
+  {% endfor %}
+</div>
+{% endblock %}

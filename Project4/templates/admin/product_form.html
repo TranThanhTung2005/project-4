@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Sửa' if product else 'Thêm' }} sản phẩm{% endblock %}
+{% block admin_content %}
+<h1>{{ 'Sửa' if product else 'Thêm' }} sản phẩm</h1>
+<form class="panel card-body form-grid" method="post">
+  <div><label>SKU</label><input name="sku" required value="{{ product.g6_SKU if product else '' }}"></div>
+  <div><label>Tên sản phẩm</label><input name="name" required value="{{ product.g6_ProductName if product else '' }}"></div>
+  <div>
+    <label>Danh mục</label>
+    <select name="category_id" required>
+      {% for category in categories %}
+        <option value="{{ category.g6_CategoryID }}" {% if product and product.g6_CategoryID == category.g6_CategoryID %}selected{% endif %}>{{ category.g6_CategoryName }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label>Thương hiệu</label>
+    <select name="brand_id">
+      <option value="">Không chọn</option>
+      {% for brand in brands %}
+        <option value="{{ brand.g6_BrandID }}" {% if product and product.g6_BrandID == brand.g6_BrandID %}selected{% endif %}>{{ brand.g6_BrandName }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div><label>Giá</label><input name="price" type="number" min="0" required value="{{ product.g6_Price if product else 0 }}"></div>
+  <div><label>Tồn kho</label><input name="stock" type="number" min="0" required value="{{ product.g6_Stock if product else 0 }}"></div>
+  <div><label>Đơn vị</label><input name="unit" required value="{{ product.g6_Unit if product else 'Cái' }}"></div>
+  <div><label>Ảnh URL</label><input name="image_url" placeholder="/images/ten-anh.jpg" value="{{ product.g6_ImageURL if product else '/images/tl-027.jpg' }}"></div>
+  <div class="span-2"><label>Mô tả</label><textarea name="description" rows="5">{{ product.g6_Description if product else '' }}</textarea></div>
+  <div><label><input type="checkbox" name="is_active" style="width:auto" {% if not product or product.g6_IsActive %}checked{% endif %}> Hiển thị</label></div>
+  <div class="row">
+    <button class="btn" type="submit">Lưu</button>
+    <a class="btn secondary" href="{{ url_for('admin_products') }}">Quay lại</a>
+  </div>
+</form>
+{% endblock %}

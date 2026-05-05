@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Đơn của tôi{% endblock %}
+{% block content %}
+<h1>Đơn của tôi</h1>
+<table class="table">
+  <tr><th>Mã đơn</th><th>Trạng thái</th><th>Địa chỉ</th><th>Tổng</th><th>Ngày tạo</th></tr>
+  {% for order in orders %}
+    <tr>
+      <td>#{{ order.g6_OrderID }}</td>
+      <td>{{ order.g6_OrderStatus }}</td>
+      <td>{{ order.g6_ShippingAddress }}</td>
+      <td>{{ order.g6_FinalAmount|vnd }}</td>
+      <td>{{ order.g6_CreatedAt }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5">Chưa có đơn hàng.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

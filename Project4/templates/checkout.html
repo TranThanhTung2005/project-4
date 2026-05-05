@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Thanh toán{% endblock %}
+{% block content %}
+<h1>Thanh toán</h1>
+<div class="grid" style="grid-template-columns: 1fr 1fr">
+  <form class="panel card-body" method="post">
+    <label>Số điện thoại</label>
+    <input name="phone" value="{{ customer.g6_Phone if customer else '' }}">
+    <label>Địa chỉ giao hàng</label>
+    <input name="address" required value="{{ customer.g6_Address if customer else '' }}">
+    <label>Ghi chú</label>
+    <textarea name="note" rows="4"></textarea>
+    <button class="btn" type="submit">Đặt hàng</button>
+  </form>
+  <div class="panel card-body">
+    <h2>Đơn hàng</h2>
+    {% for item in items %}
+      <div class="between"><span>{{ item.product.g6_ProductName }} x {{ item.quantity }}</span><strong>{{ item.subtotal|vnd }}</strong></div>
+    {% endfor %}
+    <hr>
+    <div class="between"><strong>Tổng cộng</strong><strong>{{ total|vnd }}</strong></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Sản phẩm{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <div class="eyebrow">Tìm kiếm sản phẩm</div>
+    <h1>Lọc theo tên, danh mục hoặc thương hiệu</h1>
+  </div>
+  <span class="btn secondary">{{ total }} kết quả</span>
+</section>
+
+<form class="toolbar" method="get">
+  <div>
+    <label>Tìm kiếm</label>
+    <input name="q" value="{{ filters.q }}" placeholder="Tên sản phẩm, SKU, mô tả">
+  </div>
+  <div>
+    <label>Danh mục</label>
+    <select name="category">
+      <option value="">Tất cả</option>
+      {% for category in categories %}
+        <option value="{{ category.g6_CategoryID }}" {% if filters.category == category.g6_CategoryID|string %}selected{% endif %}>{{ category.g6_CategoryName }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label>Thương hiệu</label>
+    <select name="brand">
+      <option value="">Tất cả</option>
+      {% for brand in brands %}
+        <option value="{{ brand.g6_BrandID }}" {% if filters.brand == brand.g6_BrandID|string %}selected{% endif %}>{{ brand.g6_BrandName }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button class="btn" type="submit">Lọc</button>
+</form>
+
+<div class="grid product-grid">
+  {% for product in products %}
+    {% include "_product_card.html" %}
+  {% else %}
+    <p>Không có sản phẩm phù hợp.</p>
+  {% endfor %}
+</div>
+
+<div class="row" style="margin-top:26px">
+  {% if page > 1 %}
+    <a class="btn secondary" href="{{ url_for('products', q=filters.q, category=filters.category, brand=filters.brand, page=page-1) }}">Trang trước</a>
+  {% endif %}
+  <span class="btn secondary">Trang {{ page }}/{{ pages }}</span>
+  {% if page < pages %}
+    <a class="btn secondary" href="{{ url_for('products', q=filters.q, category=filters.category, brand=filters.brand, page=page+1) }}">Trang sau</a>
+  {% endif %}
+</div>
+{% endblock %}

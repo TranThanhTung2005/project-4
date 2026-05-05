@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+{% block title %}Quản lý sản phẩm{% endblock %}
+{% block admin_content %}
+<div class="between">
+  <h1>Quản lý sản phẩm</h1>
+  <a class="btn" href="{{ url_for('admin_product_new') }}">Thêm sản phẩm</a>
+</div>
+<table class="table">
+  <tr><th>SKU</th><th>Tên</th><th>Danh mục</th><th>Giá</th><th>Kho</th><th>Trạng thái</th><th></th></tr>
+  {% for product in products %}
+    <tr>
+      <td>{{ product.g6_SKU }}</td>
+      <td>{{ product.g6_ProductName }}<br><span class="muted">{{ product.g6_BrandName or '' }}</span></td>
+      <td>{{ product.g6_CategoryName }}</td>
+      <td>{{ product.g6_Price|vnd }}</td>
+      <td>{{ product.g6_Stock }}</td>
+      <td>{{ 'Hiển thị' if product.g6_IsActive else 'Đã ẩn' }}</td>
+      <td class="row">
+        <a class="btn secondary" href="{{ url_for('admin_product_edit', product_id=product.g6_ProductID) }}">Sửa</a>
+        <form method="post" action="{{ url_for('admin_product_delete', product_id=product.g6_ProductID) }}">
+          <button class="btn danger" type="submit">Ẩn</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

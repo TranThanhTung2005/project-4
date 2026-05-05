@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% block title %}Quản lý đơn hàng{% endblock %}
+{% block admin_content %}
+<h1>Quản lý đơn hàng</h1>
+<table class="table">
+  <tr><th>Mã</th><th>Khách hàng</th><th>Địa chỉ</th><th>Tổng</th><th>Trạng thái</th></tr>
+  {% for order in orders %}
+    <tr>
+      <td>#{{ order.g6_OrderID }}</td>
+      <td>{{ order.g6_FullName }}<br><span class="muted">{{ order.g6_Email }}</span></td>
+      <td>{{ order.g6_ShippingAddress }}</td>
+      <td>{{ order.g6_FinalAmount|vnd }}</td>
+      <td>
+        <form method="post" action="{{ url_for('admin_order_status', order_id=order.g6_OrderID) }}" class="row">
+          <select name="status">
+            {% for status in ['pending','confirmed','shipping','delivered','cancelled'] %}
+              <option value="{{ status }}" {% if order.g6_OrderStatus == status %}selected{% endif %}>{{ status }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn secondary" type="submit">Lưu</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}
