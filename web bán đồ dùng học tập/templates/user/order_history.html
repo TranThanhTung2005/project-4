@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section-heading">
+    <div>
+        <p class="eyebrow">Đơn hàng</p>
+        <h2>Lịch sử mua hàng</h2>
+    </div>
+    <a href="{{ url_for('site.profile') }}" class="secondary-link">Xem hồ sơ</a>
+</section>
+
+<section class="white-box detail-panel">
+    {% if orders %}
+        <div class="order-history-list">
+            {% for order in orders %}
+                <article class="order-history-card">
+                    <div class="order-history-main">
+                        <div>
+                            <p class="eyebrow">Đơn #{{ order.OrderID }}</p>
+                            <h3>{{ order.ItemCount }} sản phẩm</h3>
+                            <p class="muted-line">{{ order.CreatedAt }}</p>
+                        </div>
+                        <div class="order-history-meta">
+                            <span class="detail-pill">Trạng thái: <strong>{{ order.OrderStatus }}</strong></span>
+                            <span class="detail-pill">Tổng thanh toán: <strong>{{ "{:,.0f}".format(order.FinalAmount) }}đ</strong></span>
+                        </div>
+                    </div>
+                    <div class="order-history-actions">
+                        <button type="button" class="btn-inline" onclick="reorderOrder({{ order.OrderID }})">Mua lại đơn này</button>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="muted-line">Bạn chưa có đơn hàng nào.</p>
+    {% endif %}
+</section>
+{% endblock %}
