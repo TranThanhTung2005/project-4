@@ -1,0 +1,130 @@
+﻿{% extends "g6base.html" %}
+
+{% block content %}
+<section class="product-detail-shell">
+    <article class="product-detail-card white-box">
+        <div class="product-detail-media">
+            {% if product.ImageURL %}
+                <img src="{{ product.ImageURL }}" alt="{{ product.ProductName }}" class="product-detail-image">
+            {% else %}
+                <div class="product-detail-placeholder">EduStore</div>
+            {% endif %}
+        </div>
+        <div class="product-detail-info">
+            <p class="eyebrow">{{ product.CategoryName }}</p>
+            <h1 class="product-detail-title">{{ product.ProductName }}</h1>
+            {% if product.BrandName %}
+                <p class="muted-line">Thương hiệu: {{ product.BrandName }}</p>
+            {% endif %}
+            <div class="product-detail-stats">
+                <div class="detail-pill">Giá: <strong>{{ "{:,.0f}".format(product.Price) }}đ</strong></div>
+                <div class="detail-pill">Tồn kho: <strong>{{ product.Stock }} {{ product.Unit or "" }}</strong></div>
+                <div class="detail-pill">Đánh giá: <strong>{{ review_summary.AverageRating }}/5</strong></div>
+            </div>
+            <p class="product-detail-description">{{ product.Description or "Sản phẩm hiện chưa có mô tả chi tiết." }}</p>
+            <div class="product-detail-cart">
+                <label for="qty-{{ product.ProductID }}">Số lượng</label>
+                <input
+                    id="qty-{{ product.ProductID }}"
+                    class="auth-input product-detail-qty"
+                    type="number"
+                    value="1"
+                    min="1"
+                    max="{{ product.Stock }}"
+                    {% if product.Stock <= 0 %}disabled{% endif %}
+                >
+                <button
+                    type="button"
+                    class="auth-submit product-detail-add"
+                    onclick='handleAddToCart({{ product.ProductID }}, {{ product.ProductName|tojson }}, {{ product.Price|float }})'
+                    {% if product.Stock <= 0 %}disabled{% endif %}
+                >
+                    Thêm vào giỏ hàng
+                </button>
+            </div>
+            <div class="product-detail-actions">
+                <a href="/" class="secondary-link">Quay lại mua sắm</a>
+                <a href="/cart" class="secondary-link">Xem giỏ hàng</a>
+            </div>
+        </div>
+    </article>
+
+    <section class="product-detail-grid">
+        <div class="white-box detail-panel">
+            <div class="admin-section-head">
+                <div>
+                    <p class="eyebrow">Đánh giá sản phẩm</p>
+                    <h3>{{ review_summary.ReviewCount }} nhận xét từ khách hàng</h3>
+                </div>
+            </div>
+            {% if reviews %}
+                <div class="review-list">
+                    {% for review in reviews %}
+                        <article class="review-card">
+                            <div class="review-head">
+                                <strong>{{ review.CustomerName }}</strong>
+                                <span>{{ review.Rating }}/5</span>
+                            </div>
+                            <p class="muted-line">{{ review.CreatedAt }}</p>
+                            <p>{{ review.Comment or "Khách hàng chưa để lại nội dung." }}</p>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted-line">Sản phẩm này chưa có bình luận nào.</p>
+            {% endif %}
+        </div>
+
+        <div class="detail-side">
+            <section class="white-box detail-panel">
+                <div class="admin-section-head">
+                    <div>
+                        <p class="eyebrow">Gửi đánh giá</p>
+                        <h3>Chia sẻ cảm nhận của bạn</h3>
+                    </div>
+                </div>
+                {% if current_user %}
+                    <form method="post" action="{{ url_for('site.create_product_review', product_id=product.ProductID) }}" class="admin-form">
+                        <select name="rating" class="admin-select" required>
+                            <option value="">Chọn số sao</option>
+                            {% for star in range(5, 0, -1) %}
+                                <option value="{{ star }}">{{ star }} sao</option>
+                            {% endfor %}
+                        </select>
+                        <textarea name="comment" class="auth-input detail-textarea" placeholder="Ví dụ: Sản phẩm đẹp, chắc chắn, đúng như mô tả."></textarea>
+                        <button type="submit" class="btn-inline">Gửi đánh giá</button>
+                    </form>
+                {% else %}
+                    <p class="muted-line">Bạn cần đăng nhập để gửi bình luận và đánh giá.</p>
+                    <a href="{{ url_for('auth.login', next=request.path) }}" class="secondary-link">Đăng nhập ngay</a>
+                {% endif %}
+            </section>
+
+            <section class="white-box detail-panel">
+                <div class="admin-section-head">
+                    <div>
+                        <p class="eyebrow">Cùng danh mục</p>
+                        <h3>Sản phẩm liên quan</h3>
+                    </div>
+                </div>
+                {% if related_products %}
+                    <div class="admin-mini-list">
+                        {% for item in related_products %}
+                            <div class="linked-row">
+                                <div>
+                                    <strong>{{ item.ProductName }}</strong>
+                                    <p class="muted-line">{{ "{:,.0f}".format(item.Price) }}đ · Còn {{ item.Stock }}</p>
+                                </div>
+                                <a href="{{ url_for('site.product_detail', product_id=item.ProductID) }}" class="secondary-link">Xem chi tiết</a>
+                            </div>
+                            {% if not loop.last %}<hr class="admin-divider">{% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="muted-line">Chưa có thêm sản phẩm liên quan trong danh mục này.</p>
+                {% endif %}
+            </section>
+        </div>
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,52 @@
+﻿{% extends "g6base.html" %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-panel">
+        <div class="auth-copy">
+            <p class="eyebrow">Đăng ký</p>
+            <h1>Tạo tài khoản người dùng</h1>
+            <p class="hero-text">Tạo tài khoản để lưu thông tin mua sắm và sẵn sàng cho các tính năng cá nhân hoá tiếp theo.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="auth-alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="post" class="auth-form">
+            <input type="hidden" name="next" value="{{ next_url }}">
+
+            <label class="auth-label" for="full_name">Họ và tên</label>
+            <input class="auth-input" id="full_name" name="full_name" type="text" placeholder="Ví dụ: Nguyễn Văn A" required>
+
+            <label class="auth-label" for="email">Email</label>
+            <input class="auth-input" id="email" name="email" type="email" placeholder="Ví dụ: ban@email.com" required>
+
+            <label class="auth-label" for="phone">Số điện thoại</label>
+            <input class="auth-input" id="phone" name="phone" type="text" placeholder="Ví dụ: 0901234567">
+
+            <label class="auth-label" for="address">Địa chỉ</label>
+            <input class="auth-input" id="address" name="address" type="text" placeholder="Ví dụ: 12 Lê Lợi, Quận 1, TP.HCM">
+
+            <label class="auth-label" for="password">Mật khẩu</label>
+            <input class="auth-input" id="password" name="password" type="password" placeholder="Ví dụ: matkhau123" required>
+
+            <label class="admin-check">
+                <input type="checkbox" name="request_admin_role">
+                Tôi muốn gửi yêu cầu xin quyền quản trị viên khi đăng ký
+            </label>
+
+            <button type="submit" class="auth-submit">Tạo tài khoản</button>
+        </form>
+
+        <div class="auth-hint">
+            <strong>Đã có tài khoản?</strong>
+            <span><a href="{{ url_for('auth.login', next=next_url) }}" class="secondary-link">Đăng nhập tại đây</a></span>
+        </div>
+    </div>
+</section>
+{% endblock %}

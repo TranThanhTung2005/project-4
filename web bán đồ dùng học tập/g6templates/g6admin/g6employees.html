@@ -1,0 +1,78 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<div class="admin-panel-grid">
+    <section class="white-box admin-panel">
+        <div class="admin-section-head">
+            <div><p class="eyebrow">Nhân viên</p><h3>Quản lý nhân viên hệ thống</h3></div>
+        </div>
+        <form method="post" action="{{ url_for('admin.create_employee') }}" class="admin-form" id="employeeForm">
+            <h4 id="employeeFormTitle">Thêm nhân viên</h4>
+            <input id="employeeId" type="hidden">
+            <input class="auth-input" name="full_name" type="text" placeholder="Nhập họ tên nhân viên" required>
+            <input class="auth-input" name="email" type="email" placeholder="Nhập email nhân viên" required>
+            <input class="auth-input" name="phone" type="text" placeholder="Nhập số điện thoại">
+            <input class="auth-input" name="position" type="text" placeholder="Nhập chức vụ" required>
+            <input class="auth-input" name="hire_date" type="date" required>
+            <input class="auth-input" name="salary" type="number" min="0" step="1000" placeholder="Nhập lương">
+            <label class="checkbox-line"><input type="checkbox" name="is_active" checked> Đang hoạt động</label>
+            <div style="display:flex; gap:8px;">
+                <button type="submit" class="btn-inline" id="employeeSaveBtn">Lưu nhân viên</button>
+                <button type="button" class="btn-inline hidden-form" id="employeeCancelBtn" onclick="resetEmployeeForm()" style="background:#999;">Hủy</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="white-box admin-panel">
+        <div class="admin-section-head">
+            <div><p class="eyebrow">Danh sách</p><h3>Nhân viên hiện có</h3></div>
+        </div>
+        <div class="admin-mini-list">
+            {% for employee in employees %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ employee.FullName }}</strong>
+                        <p class="muted-line">{{ employee.Position }} · {{ employee.Email }}</p>
+                        <p class="muted-line">Lương {{ "{:,.0f}".format(employee.Salary) }}đ · {{ 'Hoạt động' if employee.IsActive else 'Tạm khóa' }}</p>
+                    </div>
+                    <div class="action-cell">
+                        <a href="{{ url_for('admin.employee_detail', employee_id=employee.EmployeeID) }}" class="secondary-link">Xem chi tiết</a>
+                        <button type="button" class="secondary-link" onclick="editEmployee({{ employee.EmployeeID }}, {{ employee.FullName|tojson }}, {{ employee.Email|tojson }}, {{ (employee.Phone or '')|tojson }}, {{ employee.Position|tojson }}, {{ (employee.HireDate or '')|tojson }}, {{ employee.Salary or 0 }}, {{ 1 if employee.IsActive else 0 }})">Sửa</button>
+                        <form method="post" action="{{ url_for('admin.delete_employee', employee_id=employee.EmployeeID) }}" onsubmit="return confirm('Xóa nhân viên này?');">
+                            <button type="submit" class="btn-inline btn-danger">Xóa</button>
+                        </form>
+                    </div>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<script>
+function editEmployee(id, fullName, email, phone, position, hireDate, salary, isActive) {
+    const form = document.getElementById('employeeForm');
+    form.action = '/admin/employees/' + id + '/update';
+    form.querySelector('input[name="full_name"]').value = fullName;
+    form.querySelector('input[name="email"]').value = email;
+    form.querySelector('input[name="phone"]').value = phone || '';
+    form.querySelector('input[name="position"]').value = position;
+    form.querySelector('input[name="hire_date"]').value = hireDate;
+    form.querySelector('input[name="salary"]').value = salary;
+    form.querySelector('input[name="is_active"]').checked = !!isActive;
+    document.getElementById('employeeFormTitle').textContent = 'Sửa nhân viên';
+    document.getElementById('employeeSaveBtn').textContent = 'Cập nhật nhân viên';
+    document.getElementById('employeeCancelBtn').classList.remove('hidden-form');
+}
+
+function resetEmployeeForm() {
+    const form = document.getElementById('employeeForm');
+    form.action = "{{ url_for('admin.create_employee') }}";
+    form.reset();
+    form.querySelector('input[name="is_active"]').checked = true;
+    document.getElementById('employeeFormTitle').textContent = 'Thêm nhân viên';
+    document.getElementById('employeeSaveBtn').textContent = 'Lưu nhân viên';
+    document.getElementById('employeeCancelBtn').classList.add('hidden-form');
+}
+</script>
+{% endblock %}

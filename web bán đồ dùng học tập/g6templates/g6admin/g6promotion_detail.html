@@ -1,0 +1,22 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết khuyến mãi</p>
+            <h3>{{ promotion.Code }}</h3>
+        </div>
+        <a href="{{ url_for('admin.promotions_page') }}" class="secondary-link">Quay lại khuyến mãi</a>
+    </div>
+    <div class="detail-meta-grid">
+        <div class="detail-meta-card"><span>Loại giảm</span><strong>{{ promotion.DiscountType }}</strong></div>
+        <div class="detail-meta-card"><span>Giá trị</span><strong>{{ promotion.DiscountValue }}</strong></div>
+        <div class="detail-meta-card"><span>Đơn tối thiểu</span><strong>{{ promotion.MinOrderValue or 0 }}</strong></div>
+        <div class="detail-meta-card"><span>Số lượt dùng tối đa</span><strong>{{ promotion.MaxUses or 'Không giới hạn' }}</strong></div>
+        <div class="detail-meta-card"><span>Đã dùng</span><strong>{{ promotion.UsedCount or 0 }}</strong></div>
+        <div class="detail-meta-card"><span>Trạng thái</span><strong>{{ 'Đang bật' if promotion.IsActive else 'Đã tắt' }}</strong></div>
+    </div>
+    <p class="detail-description">{{ promotion.Description or 'Khuyến mãi chưa có mô tả.' }}</p>
+</section>
+{% endblock %}

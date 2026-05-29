@@ -1,0 +1,80 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<style>
+    .action-cell {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        width: 100%;
+        min-width: 0;
+    }
+    .action-cell a,
+    .action-cell button,
+    .action-cell form {
+        white-space: nowrap;
+    }
+</style>
+
+<div class="admin-panel-grid">
+    <section class="white-box admin-panel">
+        <div class="admin-section-head"><div><p class="eyebrow">Sản phẩm</p><h3>Thêm nhanh sản phẩm mới</h3></div></div>
+        <form method="post" action="{{ url_for('admin.create_product') }}" class="admin-form" enctype="multipart/form-data">
+            <input class="auth-input" name="sku" type="text" placeholder="Nhập mã sản phẩm, ví dụ: VPP-010" required>
+            <input class="auth-input" name="product_name" type="text" placeholder="Nhập tên sản phẩm, ví dụ: Bút gel xanh" required>
+            <input class="auth-input" name="description" type="text" placeholder="Nhập mô tả ngắn cho sản phẩm, ví dụ: Ngòi 0.5mm, viết êm">
+            <div class="admin-form-row">
+                <select class="admin-select" name="category_id" required>
+                    <option value="">Chọn danh mục</option>
+                    {% for category in categories %}
+                        <option value="{{ category.CategoryID }}">{{ category.CategoryName }} (ID: {{ category.CategoryID }})</option>
+                    {% endfor %}
+                </select>
+                <select class="admin-select" name="brand_id">
+                    <option value="">Chọn thương hiệu</option>
+                    {% for brand in brands %}
+                        <option value="{{ brand.BrandID }}">{{ brand.BrandName }} (ID: {{ brand.BrandID }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="admin-form-row">
+                <input class="auth-input" name="price" type="number" min="1" step="1" placeholder="Nhập giá bán, ví dụ: 15000" required>
+                <input class="auth-input" name="stock" type="number" min="1" step="1" placeholder="Nhập số lượng tồn kho, ví dụ: 120" required>
+            </div>
+            <div class="admin-form-row">
+                <input class="auth-input" name="unit" type="text" placeholder="Nhập đơn vị tính, ví dụ: Cái, Hộp, Quyển">
+                <input class="auth-input" name="image_url" type="text" placeholder="Nhập đường dẫn ảnh, ví dụ: /images/VPP-010.jpg">
+            </div>
+            <input class="auth-input" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+            <label class="admin-check"><input type="checkbox" name="is_active" checked> Hiển thị sản phẩm</label>
+            <button type="submit" class="auth-submit">Thêm sản phẩm</button>
+        </form>
+    </section>
+
+    <section class="white-box admin-panel">
+        <div class="admin-section-head"><div><p class="eyebrow">Danh sách</p><h3>Sản phẩm gần đây</h3></div></div>
+        <div class="admin-table">
+            <table>
+                <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th>Giá</th><th>Hàng tồn</th><th>Thao tác</th></tr></thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td>{{ product.ProductName }}</td>
+                            <td>{{ product.CategoryName }}</td>
+                            <td>{{ "{:,.0f}".format(product.Price) }}đ</td>
+                            <td>{{ product.Stock }}</td>
+                            <td class="action-cell">
+                                <a href="{{ url_for('admin.product_detail', product_id=product.ProductID) }}#edit-product" class="secondary-link">Sửa sản phẩm</a>
+                                <a href="{{ url_for('admin.product_detail', product_id=product.ProductID) }}" class="secondary-link">Xem chi tiết</a>
+                                <form method="post" action="{{ url_for('admin.delete_product', product_id=product.ProductID) }}"><button type="submit" class="btn-inline btn-danger">Xoá</button></form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

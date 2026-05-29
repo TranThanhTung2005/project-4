@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduStore - Dụng cụ học tập</title>
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("edustore_theme");
+            const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.dataset.theme = savedTheme || (prefersDark ? "dark" : "light");
+        })();
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='g6style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">🎓 EduStore</a>
+            <div class="nav-menu">
+                {% if request.blueprint != 'admin' %}
+                    <a href="/" class="nav-item">Trang chủ</a>
+                {% endif %}
+                {% if request.blueprint not in ['admin', 'auth'] %}
+                    <div class="nav-inline-tools">
+                        <div class="nav-search-toggle">
+                            <button type="button" class="nav-item nav-inline-trigger" onclick="toggleHeaderSearch()">
+                                <span>Tìm kiếm</span>
+                                <span class="nav-category-arrow">&#9662;</span>
+                            </button>
+                            <div class="nav-search-popover" id="nav-search-popover">
+                                <form method="get" action="{{ url_for('site.home') }}" class="nav-search-popover-form">
+                                    <span class="nav-search-label">Tìm kiếm</span>
+                                    <input
+                                        type="text"
+                                        id="search"
+                                        name="search"
+                                        class="search-bar nav-search-input"
+                                        value="{{ header_search }}"
+                                        placeholder="Tìm sản phẩm trên EduStore"
+                                        {% if request.endpoint == 'site.home' %}onkeyup="loadProducts()"{% endif %}
+                                    >
+                                    <input type="hidden" id="category-filter" name="category_id" value="{{ header_selected_category_id or '' }}">
+                                    <button type="submit" class="nav-search-submit">Tìm</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="nav-category-dropdown">
+                            <button type="button" class="nav-item nav-inline-trigger nav-category-trigger">
+                                <span id="category-filter-label">
+                                    {% if header_selected_category_id %}
+                                        {% for category in header_categories %}
+                                            {% if header_selected_category_id == category.CategoryID %}{{ category.CategoryName }}{% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        Danh mục
+                                    {% endif %}
+                                </span>
+                                <span class="nav-category-arrow">&#9662;</span>
+                            </button>
+                            <div class="nav-category-menu">
+                                <button type="button" class="nav-category-option" onclick="selectHeaderCategory('', 'Danh mục')">Tất cả danh mục</button>
+                                {% for category in header_categories %}
+                                    <button
+                                        type="button"
+                                        class="nav-category-option"
+                                        onclick='selectHeaderCategory({{ category.CategoryID|tojson }}, {{ category.CategoryName|tojson }})'
+                                    >
+                                        {{ category.CategoryName }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if request.blueprint != 'admin' %}
+                    <a href="/cart" class="nav-item">
+                        🛒 Giỏ hàng <span id="cart-count-badge">0</span>
+                    </a>
+                {% endif %}
+                {% if current_user %}
+                    {% if request.blueprint not in ['admin', 'auth'] %}
+                        <a href="{{ url_for('site.order_history') }}" class="nav-item">Đơn hàng</a>
+                        <a href="{{ url_for('site.profile') }}" class="nav-item">Tài khoản</a>
+                    {% endif %}
+                    {% if current_user.role == "admin" and request.blueprint != 'admin' %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="nav-item">Quản trị</a>
+                    {% endif %}
+                    <div class="nav-user">
+                        <span class="nav-user-badge">{{ current_user.name }} · {{ "Quản trị viên" if current_user.role == "admin" else "Người dùng" }}</span>
+                        <form method="post" action="{{ url_for('auth.logout') }}">
+                            <button type="submit" class="nav-item btn-login btn-logout">Đăng xuất</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div id="auth-section" class="nav-user">
+                        <a href="{{ url_for('auth.login') }}" class="nav-item btn-login">Đăng nhập</a>
+                        <a href="{{ url_for('auth.register') }}" class="nav-item btn-login btn-admin">Đăng ký</a>
+                    </div>
+                {% endif %}
+            </div>
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Đổi chế độ sáng tối" title="Đổi chế độ sáng tối">
+                <span class="theme-toggle-icon" aria-hidden="true">☀</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-stack">
+                    {% for category, message in messages %}
+                        <div class="auth-alert">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+
+    {% if request.blueprint not in ['admin', 'auth'] %}
+        <footer class="site-footer">
+            <div class="site-footer-inner">
+                <div class="site-footer-brand">
+                    <a href="{{ url_for('site.home') }}" class="logo">🎓 EduStore</a>
+                    <p class="muted-line">Dụng cụ học tập, sách và phụ kiện học đường cho học sinh, sinh viên và dân văn phòng.</p>
+                </div>
+                <div class="site-footer-links">
+                    <div class="site-footer-col">
+                        <h4>Khám phá</h4>
+                        <a href="{{ url_for('site.home') }}">Trang chủ</a>
+                        <a href="/cart">Giỏ hàng</a>
+                        {% if current_user and current_user.role == "admin" %}
+                            <a href="{{ url_for('admin.dashboard') }}">Quản trị</a>
+                        {% endif %}
+                    </div>
+                    <div class="site-footer-col">
+                        <h4>Danh mục</h4>
+                        {% for category in header_categories[:4] %}
+                            <a href="{{ url_for('site.home', category_id=category.CategoryID) }}">{{ category.CategoryName }}</a>
+                        {% endfor %}
+                    </div>
+                    <div class="site-footer-col">
+                        <h4>Liên hệ</h4>
+                        <p>Email: support@edustore.local</p>
+                        <p>Hotline: 1900 1234</p>
+                        <p>Giờ làm việc: 8:00 - 21:00</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    {% endif %}
+
+<script>
+    window.APP_CONTEXT = {
+        currentUser: {{ current_user|tojson }},
+        loginUrl: {{ url_for('auth.login', next=request.path)|tojson }},
+        registerUrl: {{ url_for('auth.register', next=request.path)|tojson }},
+        paymentBank: {
+            bankId: "MB",
+            accountNumber: {{ config.MB_BANK_ACCOUNT_NUMBER|tojson }},
+            accountName: {{ config.MB_BANK_ACCOUNT_NAME|tojson }}
+        }
+    };
+</script>
+<script src="{{ url_for('static', filename='g6app.js') }}"></script>
+<script>
+    // Gọi lại lần nữa để chắc chắn UI đồng bộ sau khi DOM load xong
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof updateCartCount === "function") updateCartCount();
+    });
+</script>
+</body>
+</html>

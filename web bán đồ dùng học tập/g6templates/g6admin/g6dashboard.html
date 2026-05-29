@@ -1,0 +1,249 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+    <section class="admin-overview-hero">
+        <div class="admin-overview-copy white-box admin-panel">
+            <div class="admin-section-head">
+                <div>
+                    <p class="eyebrow">Bảng điều khiển</p>
+                    <h2 class="admin-overview-title">Tổng quan quản trị EduStore</h2>
+                    <p class="hero-text">Theo dõi nhanh tình trạng sản phẩm, đơn hàng, người dùng và các tác vụ cần xử lý.</p>
+                </div>
+                <a href="{{ url_for('admin.products_page') }}" class="secondary-link">Quản lý sản phẩm</a>
+            </div>
+            <div class="admin-metrics admin-metrics-hero">
+                <article class="metric-card metric-card-highlight">
+                    <span class="stat-label">Sản phẩm</span>
+                    <strong>{{ metrics.products.Total if metrics.products else 0 }}</strong>
+                    <p class="muted-line">Tổng số mặt hàng đang quản lý</p>
+                </article>
+                <article class="metric-card">
+                    <span class="stat-label">Đơn hàng</span>
+                    <strong>{{ metrics.orders.Total if metrics.orders else 0 }}</strong>
+                    <p class="muted-line">Đơn đã phát sinh trên hệ thống</p>
+                </article>
+                <article class="metric-card">
+                    <span class="stat-label">Khách hàng</span>
+                    <strong>{{ metrics.customers.Total if metrics.customers else 0 }}</strong>
+                    <p class="muted-line">Hồ sơ khách hàng đã tạo</p>
+                </article>
+                <article class="metric-card">
+                    <span class="stat-label">Đánh giá</span>
+                    <strong>{{ metrics.reviews.Total if metrics.reviews else 0 }}</strong>
+                    <p class="muted-line">Nhận xét cần theo dõi</p>
+                </article>
+                <article class="metric-card">
+                    <span class="stat-label">Tài khoản</span>
+                    <strong>{{ metrics.accounts.Total if metrics.accounts else 0 }}</strong>
+                    <p class="muted-line">User và admin đang có</p>
+                </article>
+                <article class="metric-card">
+                    <span class="stat-label">Nhân viên</span>
+                    <strong>{{ metrics.employees.Total if metrics.employees else 0 }}</strong>
+                    <p class="muted-line">Nhân sự nội bộ đang quản lý</p>
+                </article>
+                <article class="metric-card">
+                    <span class="stat-label">Nhà cung cấp</span>
+                    <strong>{{ metrics.suppliers.Total if metrics.suppliers else 0 }}</strong>
+                    <p class="muted-line">Đối tác cung ứng hiện có</p>
+                </article>
+                <article class="metric-card">
+                    <span class="stat-label">Doanh thu</span>
+                    <strong>{{ "{:,.0f}".format(metrics.revenue.TotalRevenue if metrics.revenue else 0) }}đ</strong>
+                    <p class="muted-line">Tổng đơn chưa bị huỷ</p>
+                </article>
+            </div>
+        </div>
+
+        <aside class="admin-overview-side white-box admin-panel">
+            <p class="eyebrow">Tác vụ nhanh</p>
+            <h3>Điểm cần chú ý</h3>
+            <div class="admin-quick-list">
+                <div class="admin-quick-item">
+                    <span class="admin-quick-number">{{ admin_requests|length }}</span>
+                    <div>
+                        <strong>Yêu cầu admin chờ duyệt</strong>
+                        <p class="muted-line">Xử lý trong mục tài khoản</p>
+                    </div>
+                </div>
+                <div class="admin-quick-item">
+                    <span class="admin-quick-number">{{ orders|length }}</span>
+                    <div>
+                        <strong>Đơn hàng mới hiển thị</strong>
+                        <p class="muted-line">Theo danh sách gần nhất</p>
+                    </div>
+                </div>
+                <div class="admin-quick-item">
+                    <span class="admin-quick-number">{{ activities|length }}</span>
+                    <div>
+                        <strong>Hoạt động gần đây</strong>
+                        <p class="muted-line">Thêm giỏ, thanh toán, tương tác</p>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-shortcuts">
+                <a href="{{ url_for('admin.accounts_page') }}" class="secondary-link">Mở tài khoản</a>
+                <a href="{{ url_for('admin.orders_page') }}" class="secondary-link">Mở đơn hàng</a>
+                <a href="{{ url_for('admin.catalog_page') }}" class="secondary-link">Mở danh mục</a>
+                <a href="{{ url_for('admin.employees_page') }}" class="secondary-link">Mở nhân viên</a>
+                <a href="{{ url_for('admin.suppliers_page') }}" class="secondary-link">Mở nhà cung cấp</a>
+            </div>
+        </aside>
+    </section>
+
+    <div class="admin-two-col admin-dashboard-grid">
+        <section class="white-box admin-panel admin-full-span">
+            <div class="admin-section-head">
+                <div>
+                    <p class="eyebrow">Doanh thu</p>
+                    <h3>Biểu đồ 12 tháng gần nhất</h3>
+                </div>
+                <div class="admin-revenue-inline">
+                    <span class="detail-pill">Đã giao: {{ "{:,.0f}".format(revenue_summary.DeliveredRevenue if revenue_summary else 0) }}đ</span>
+                    <span class="detail-pill">Đang xử lý: {{ "{:,.0f}".format(revenue_summary.PipelineRevenue if revenue_summary else 0) }}đ</span>
+                </div>
+            </div>
+            {% if monthly_revenue %}
+                <div class="revenue-chart">
+                    {% for month in monthly_revenue|reverse %}
+                        <article class="revenue-bar-card">
+                            <div class="revenue-bar-shell">
+                                <div
+                                    class="revenue-bar-fill"
+                                    style="height: {{ ((month.Revenue / revenue_chart_max) * 100) if revenue_chart_max else 0 }}%;"
+                                    title="{{ '{:,.0f}'.format(month.Revenue) }}đ"
+                                ></div>
+                            </div>
+                            <strong>{{ "{:,.0f}".format(month.Revenue) }}đ</strong>
+                            <span>Th{{ month.RevenueMonth }}/{{ month.RevenueYear }}</span>
+                        </article>
+                    {% endfor %}
+                </div>
+                <div class="admin-mini-list">
+                    {% for item in revenue_by_status %}
+                        <div class="linked-row">
+                            <div>
+                                <strong>{{ item.OrderStatus }}</strong>
+                                <p class="muted-line">{{ item.OrderCount }} đơn</p>
+                            </div>
+                            <strong>{{ "{:,.0f}".format(item.Revenue) }}đ</strong>
+                        </div>
+                        {% if not loop.last %}<hr class="admin-divider">{% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted-line">Chưa có dữ liệu doanh thu.</p>
+            {% endif %}
+        </section>
+
+        <section class="white-box admin-panel">
+            <div class="admin-section-head">
+                <div>
+                    <p class="eyebrow">Đơn hàng gần đây</p>
+                    <h3>Theo dõi trạng thái xử lý</h3>
+                </div>
+                <a href="{{ url_for('admin.orders_page') }}" class="secondary-link">Xem tất cả</a>
+            </div>
+            {% if orders %}
+                <div class="admin-mini-list">
+                    {% for order in orders[:5] %}
+                        <div class="linked-row">
+                            <div>
+                                <strong>Đơn #{{ order.OrderID }} · {{ order.CustomerName }}</strong>
+                                <p class="muted-line">{{ "{:,.0f}".format(order.TotalAmount) }}đ · {{ order.OrderStatus }}</p>
+                                <p class="muted-line">{{ order.CreatedAt }}</p>
+                            </div>
+                            <a href="{{ url_for('admin.order_detail', order_id=order.OrderID) }}" class="secondary-link">Xem chi tiết</a>
+                        </div>
+                        {% if not loop.last %}<hr class="admin-divider">{% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted-line">Chưa có đơn hàng nào.</p>
+            {% endif %}
+        </section>
+
+        <section class="white-box admin-panel">
+            <div class="admin-section-head">
+                <div>
+                    <p class="eyebrow">Sản phẩm mới</p>
+                    <h3>Cập nhật kho và danh mục</h3>
+                </div>
+                <a href="{{ url_for('admin.products_page') }}" class="secondary-link">Xem tất cả</a>
+            </div>
+            {% if products %}
+                <div class="admin-mini-list">
+                    {% for product in products[:5] %}
+                        <div class="linked-row">
+                            <div>
+                                <strong>{{ product.ProductName }}</strong>
+                                <p class="muted-line">{{ product.CategoryName }}{% if product.BrandName %} · {{ product.BrandName }}{% endif %}</p>
+                                <p class="muted-line">{{ "{:,.0f}".format(product.Price) }}đ · Hàng tồn {{ product.Stock }}</p>
+                            </div>
+                            <a href="{{ url_for('admin.product_detail', product_id=product.ProductID) }}" class="secondary-link">Xem chi tiết</a>
+                        </div>
+                        {% if not loop.last %}<hr class="admin-divider">{% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted-line">Chưa có sản phẩm nào.</p>
+            {% endif %}
+        </section>
+
+        <section class="white-box admin-panel">
+            <div class="admin-section-head">
+                <div>
+                    <p class="eyebrow">Yêu cầu quản trị</p>
+                    <h3>Tài khoản cần xét duyệt</h3>
+                </div>
+                <a href="{{ url_for('admin.accounts_page') }}" class="secondary-link">Mở tài khoản</a>
+            </div>
+            {% if admin_requests %}
+                <div class="admin-mini-list">
+                    {% for account in admin_requests[:5] %}
+                        <div class="linked-row">
+                            <div>
+                                <strong>{{ account.FullName }}</strong>
+                                <p class="muted-line">{{ account.Email }}</p>
+                                <p class="muted-line">Yêu cầu: {{ account.RequestedRole }}</p>
+                            </div>
+                            <a href="{{ url_for('admin.account_detail', account_id=account.AccountID) }}" class="secondary-link">Xem chi tiết</a>
+                        </div>
+                        {% if not loop.last %}<hr class="admin-divider">{% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted-line">Không có yêu cầu mới.</p>
+            {% endif %}
+        </section>
+
+        <section class="white-box admin-panel">
+            <div class="admin-section-head">
+                <div>
+                    <p class="eyebrow">Hoạt động người dùng</p>
+                    <h3>Thêm giỏ hàng và thanh toán</h3>
+                </div>
+            </div>
+            {% if activities %}
+                <div class="admin-activity-feed">
+                    {% for activity in activities[:6] %}
+                        <article class="admin-activity-item">
+                            <div class="admin-activity-dot"></div>
+                            <div>
+                                <strong>{{ activity.Title }}</strong>
+                                <p class="muted-line">{{ activity.Details }}</p>
+                                <p class="muted-line">{{ activity.ActorEmail }} · {{ activity.CreatedAt }}</p>
+                                {% if activity.RelatedOrderID %}
+                                    <a href="{{ url_for('admin.order_detail', order_id=activity.RelatedOrderID) }}" class="secondary-link">Xem chi tiết</a>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted-line">Chưa có hoạt động nào được ghi nhận.</p>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}
+

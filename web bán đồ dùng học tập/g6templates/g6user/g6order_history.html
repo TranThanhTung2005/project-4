@@ -1,0 +1,88 @@
+{% extends "g6base.html" %}
+
+{% block content %}
+<section class="section-heading order-history-heading">
+    <div>
+        <p class="eyebrow">Đơn hàng</p>
+        <h2>Lịch sử mua hàng</h2>
+    </div>
+    <a href="{{ url_for('site.profile') }}" class="secondary-link">Xem hồ sơ</a>
+</section>
+
+<section class="shop-order-shell">
+    <nav class="shop-order-tabs" aria-label="Lọc trạng thái đơn hàng">
+        {% for tab in status_tabs %}
+            <a
+                href="{{ url_for('site.order_history', status=tab.key) }}"
+                class="shop-order-tab {% if active_status == tab.key %}active{% endif %}"
+            >
+                <span>{{ tab.label }}</span>
+                <strong>{{ tab.count }}</strong>
+            </a>
+        {% endfor %}
+    </nav>
+
+    {% if orders %}
+        <div class="shop-order-list">
+            {% for order in orders %}
+                <article class="shop-order-card">
+                    <header class="shop-order-card-head">
+                        <div class="shop-order-store">
+                            <span class="shop-order-store-icon">Edu</span>
+                            <div>
+                                <strong>EduStore</strong>
+                                <p>Đơn #{{ order.OrderID }} · {{ order.CreatedAt }}</p>
+                            </div>
+                        </div>
+                        <span class="shop-order-status status-{{ order.OrderStatus }}">{{ order.StatusLabel }}</span>
+                    </header>
+
+                    <div class="shop-order-products">
+                        {% for item in order.Items %}
+                            <div class="shop-order-product">
+                                <a href="{{ url_for('site.product_detail', product_id=item.ProductID) }}" class="shop-order-thumb {% if not item.ImageURL %}image-missing{% endif %}">
+                                    {% if item.ImageURL %}
+                                        <img src="{{ item.ImageURL }}" alt="{{ item.ProductName }}" loading="lazy">
+                                    {% else %}
+                                        <span>EduStore</span>
+                                    {% endif %}
+                                </a>
+                                <div class="shop-order-product-info">
+                                    <a href="{{ url_for('site.product_detail', product_id=item.ProductID) }}">{{ item.ProductName }}</a>
+                                    <span>x{{ item.Quantity }}</span>
+                                </div>
+                                <div class="shop-order-price">
+                                    <span>{{ "{:,.0f}".format(item.UnitPrice) }}đ</span>
+                                    <strong>{{ "{:,.0f}".format(item.Subtotal) }}đ</strong>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <footer class="shop-order-card-foot">
+                        <div class="shop-order-delivery">
+                            <span>Giao tới</span>
+                            <strong>{{ order.ShippingAddress or "Chưa có địa chỉ" }}</strong>
+                        </div>
+                        <div class="shop-order-total">
+                            <span>Thành tiền</span>
+                            <strong>{{ "{:,.0f}".format(order.FinalAmount) }}đ</strong>
+                        </div>
+                        <div class="shop-order-actions">
+                            <button type="button" class="shop-order-primary" onclick="reorderOrder({{ order.OrderID }})">Mua lại</button>
+                            <a href="{{ url_for('site.home') }}" class="shop-order-secondary">Mua thêm</a>
+                        </div>
+                    </footer>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="shop-order-empty">
+            <div class="cart-empty-icon">🧾</div>
+            <h3>Chưa có đơn hàng phù hợp</h3>
+            <p class="muted-line">Các đơn hàng của bạn sẽ xuất hiện tại đây theo từng trạng thái.</p>
+            <a href="{{ url_for('site.home') }}" class="secondary-link">Tiếp tục mua sắm</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,90 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết sản phẩm</p>
+            <h3>{{ product.ProductName }}</h3>
+        </div>
+        <a href="{{ url_for('admin.products_page') }}" class="secondary-link">Quay lại sản phẩm</a>
+    </div>
+    <div class="detail-meta-grid">
+        <div class="detail-meta-card"><span>SKU</span><strong>{{ product.SKU }}</strong></div>
+        <div class="detail-meta-card"><span>Danh mục</span><strong>{{ product.CategoryName }}</strong></div>
+        <div class="detail-meta-card"><span>Thương hiệu</span><strong>{{ product.BrandName or 'Chưa có' }}</strong></div>
+        <div class="detail-meta-card"><span>Giá</span><strong>{{ "{:,.0f}".format(product.Price) }}đ</strong></div>
+        <div class="detail-meta-card"><span>Tồn kho</span><strong>{{ product.Stock }} {{ product.Unit or '' }}</strong></div>
+        <div class="detail-meta-card"><span>Hiển thị</span><strong>{{ 'Có' if product.IsActive else 'Ẩn' }}</strong></div>
+    </div>
+    {% if product.ImageURL %}
+        <div class="admin-product-image-preview">
+            <img src="{{ product.ImageURL }}" alt="{{ product.ProductName }}">
+        </div>
+    {% endif %}
+    <p class="detail-description">{{ product.Description or 'Sản phẩm chưa có mô tả.' }}</p>
+</section>
+
+<section class="white-box admin-panel" id="edit-product">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Cập nhật</p>
+            <h3>Sửa sản phẩm</h3>
+        </div>
+    </div>
+    <form method="post" action="{{ url_for('admin.update_product', product_id=product.ProductID) }}" class="admin-form" enctype="multipart/form-data">
+        <input class="auth-input" name="sku" type="text" value="{{ product.SKU }}" placeholder="Nhập mã sản phẩm" required>
+        <input class="auth-input" name="product_name" type="text" value="{{ product.ProductName }}" placeholder="Nhập tên sản phẩm" required>
+        <textarea class="auth-input detail-textarea" name="description" placeholder="Nhập mô tả sản phẩm">{{ product.Description or '' }}</textarea>
+        <div class="admin-form-row">
+            <select class="admin-select" name="category_id" required>
+                {% for category in categories %}
+                    <option value="{{ category.CategoryID }}" {% if product.CategoryID == category.CategoryID %}selected{% endif %}>
+                        {{ category.CategoryName }} (ID: {{ category.CategoryID }})
+                    </option>
+                {% endfor %}
+            </select>
+            <select class="admin-select" name="brand_id">
+                <option value="">Chọn thương hiệu</option>
+                {% for brand in brands %}
+                    <option value="{{ brand.BrandID }}" {% if product.BrandID == brand.BrandID %}selected{% endif %}>
+                        {{ brand.BrandName }} (ID: {{ brand.BrandID }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="admin-form-row">
+            <input class="auth-input" name="price" type="number" min="1" step="1" value="{{ product.Price }}" placeholder="Nhập giá bán" required>
+            <input class="auth-input" name="stock" type="number" min="1" step="1" value="{{ product.Stock }}" placeholder="Nhập số lượng tồn kho" required>
+        </div>
+        <div class="admin-form-row">
+            <input class="auth-input" name="unit" type="text" value="{{ product.Unit or '' }}" placeholder="Nhập đơn vị tính">
+            <input class="auth-input" name="image_url" type="text" value="{{ product.ImageURL or '' }}" placeholder="Nhập đường dẫn ảnh">
+        </div>
+        <input class="auth-input" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+        <label class="admin-check"><input type="checkbox" name="is_active" {% if product.IsActive %}checked{% endif %}> Hiển thị sản phẩm</label>
+        <button type="submit" class="auth-submit">Lưu thay đổi</button>
+    </form>
+</section>
+
+<section class="white-box admin-panel">
+    <div class="admin-section-head"><div><p class="eyebrow">Đánh giá liên quan</p><h3>{{ reviews|length }} đánh giá gần nhất</h3></div></div>
+    {% if reviews %}
+        <div class="admin-mini-list">
+            {% for review in reviews %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ review.CustomerName }}</strong>
+                        <p class="muted-line">{{ review.Rating }}/5 · {{ review.CreatedAt }}</p>
+                        <p>{{ review.Comment or 'Không có nội dung.' }}</p>
+                    </div>
+                    <a href="{{ url_for('admin.review_detail', review_id=review.ReviewID) }}" class="secondary-link">Xem chi tiết</a>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="muted-line">Sản phẩm này chưa có đánh giá nào.</p>
+    {% endif %}
+</section>
+{% endblock %}

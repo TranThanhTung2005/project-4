@@ -1,0 +1,48 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<div class="admin-panel-grid">
+    <section class="white-box admin-panel">
+        <div class="admin-section-head"><div><p class="eyebrow">Khuyến mãi</p><h3>Tạo chương trình giảm giá</h3></div></div>
+        <form method="post" action="{{ url_for('admin.create_promotion') }}" class="admin-form">
+            <div class="admin-form-row">
+                <input class="auth-input" name="code" type="text" placeholder="Ví dụ: GIAM20K" required>
+                <select class="admin-select" name="discount_type">
+                    <option value="percent">Phần trăm</option>
+                    <option value="fixed">Tiền cố định</option>
+                </select>
+            </div>
+            <div class="admin-form-row">
+                <input class="auth-input" name="discount_value" type="number" min="1" step="1" placeholder="Giá trị giảm" required>
+                <input class="auth-input" name="min_order_value" type="number" min="1" step="1" placeholder="Đơn tối thiểu">
+            </div>
+            <div class="admin-form-row">
+                <input class="auth-input" name="max_uses" type="number" min="1" step="1" placeholder="Số lượt dùng tối đa">
+                <input class="auth-input" name="description" type="text" placeholder="Mô tả ngắn">
+            </div>
+            <div class="admin-form-row">
+                <input class="auth-input" name="starts_at" type="text" placeholder="Ví dụ: 2026-04-01">
+                <input class="auth-input" name="expires_at" type="text" placeholder="Ví dụ: 2026-04-30">
+            </div>
+            <label class="admin-check"><input type="checkbox" name="is_active" checked> Kích hoạt khuyến mãi</label>
+            <button type="submit" class="btn-inline">Tạo khuyến mãi</button>
+        </form>
+    </section>
+
+    <section class="white-box admin-panel">
+        <div class="admin-section-head"><div><p class="eyebrow">Danh sách</p><h3>Mã khuyến mãi hiện có</h3></div></div>
+        <div class="admin-mini-list">
+            {% for promotion in promotions %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ promotion.Code }}</strong>
+                        <p class="muted-line">{{ promotion.DiscountType }} · {{ promotion.DiscountValue }}</p>
+                    </div>
+                    <a href="{{ url_for('admin.promotion_detail', promotion_id=promotion.PromotionID) }}" class="secondary-link">Xem chi tiết</a>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

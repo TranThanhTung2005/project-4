@@ -1,0 +1,61 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết khách hàng</p>
+            <h3>{{ customer.FullName }}</h3>
+        </div>
+        <a href="{{ url_for('admin.users_page') }}" class="secondary-link">Quay lại người dùng</a>
+    </div>
+    <div class="detail-meta-grid">
+        <div class="detail-meta-card"><span>Email</span><strong>{{ customer.Email }}</strong></div>
+        <div class="detail-meta-card"><span>Điện thoại</span><strong>{{ customer.Phone or 'Chưa có' }}</strong></div>
+        <div class="detail-meta-card"><span>Địa chỉ</span><strong>{{ customer.Address or 'Chưa có' }}</strong></div>
+        <div class="detail-meta-card"><span>Ngày tạo</span><strong>{{ customer.CreatedAt }}</strong></div>
+    </div>
+</section>
+
+<section class="admin-two-col">
+    <section class="white-box admin-panel">
+        <div class="admin-section-head"><div><p class="eyebrow">Đơn hàng</p><h3>{{ orders|length }} đơn gần đây</h3></div></div>
+        {% if orders %}
+            <div class="admin-mini-list">
+                {% for order in orders %}
+                    <div class="linked-row">
+                        <div>
+                            <strong>Đơn #{{ order.OrderID }}</strong>
+                            <p class="muted-line">{{ "{:,.0f}".format(order.TotalAmount) }}đ · {{ order.OrderStatus }}</p>
+                        </div>
+                        <a href="{{ url_for('admin.order_detail', order_id=order.OrderID) }}" class="secondary-link">Xem chi tiết</a>
+                    </div>
+                    {% if not loop.last %}<hr class="admin-divider">{% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted-line">Chưa có đơn hàng nào.</p>
+        {% endif %}
+    </section>
+
+    <section class="white-box admin-panel">
+        <div class="admin-section-head"><div><p class="eyebrow">Đánh giá</p><h3>{{ reviews|length }} bình luận gần đây</h3></div></div>
+        {% if reviews %}
+            <div class="admin-mini-list">
+                {% for review in reviews %}
+                    <div class="linked-row">
+                        <div>
+                            <strong>{{ review.ProductName }}</strong>
+                            <p class="muted-line">{{ review.Rating }}/5 · {{ review.CreatedAt }}</p>
+                        </div>
+                        <a href="{{ url_for('admin.review_detail', review_id=review.ReviewID) }}" class="secondary-link">Xem chi tiết</a>
+                    </div>
+                    {% if not loop.last %}<hr class="admin-divider">{% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted-line">Chưa có đánh giá nào.</p>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "g6base.html" %}
+
+{% block content %}
+<main class="cart-added-wrapper">
+    <section class="cart-added-panel white-box">
+        <div class="cart-added-icon" aria-hidden="true">✓</div>
+        <p class="eyebrow">Đã thêm vào giỏ hàng</p>
+        <h1 class="cart-title">Sản phẩm đã sẵn sàng trong giỏ</h1>
+        <p id="cart-added-message" class="hero-text">Bạn có thể kiểm tra lại giỏ hàng hoặc tiếp tục chọn thêm sản phẩm.</p>
+
+        <div id="cart-added-detail" class="cart-added-detail"></div>
+
+        <div class="cart-added-actions">
+            <a href="/cart" class="auth-submit cart-added-primary">Xem giỏ hàng</a>
+            <a href="/" class="secondary-link">Tiếp tục mua sắm</a>
+        </div>
+    </section>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (typeof renderCartAddedPage === "function") renderCartAddedPage();
+    });
+</script>
+{% endblock %}

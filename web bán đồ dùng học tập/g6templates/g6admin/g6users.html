@@ -1,0 +1,37 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<div class="admin-two-col">
+    <section class="white-box admin-panel">
+        <div class="admin-section-head"><div><p class="eyebrow">Khách hàng</p><h3>Khách hàng mới</h3></div></div>
+        <div class="admin-mini-list">
+            {% for customer in customers %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ customer.FullName }}</strong>
+                        <p class="muted-line">{{ customer.Email }}</p>
+                    </div>
+                    <a href="{{ url_for('admin.customer_detail', customer_id=customer.CustomerID) }}" class="secondary-link">Xem chi tiết</a>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="white-box admin-panel">
+        <div class="admin-section-head"><div><p class="eyebrow">Đánh giá</p><h3>Đánh giá gần đây</h3></div></div>
+        <div class="admin-mini-list">
+            {% for review in reviews %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ review.ProductName }}</strong>
+                        <p class="muted-line">{{ review.Rating }}/5 · {{ review.CustomerName }}</p>
+                    </div>
+                    <a href="{{ url_for('admin.review_detail', review_id=review.ReviewID) }}" class="secondary-link">Xem chi tiết</a>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

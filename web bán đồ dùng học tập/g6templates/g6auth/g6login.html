@@ -1,0 +1,38 @@
+﻿{% extends "g6base.html" %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-panel">
+        <div class="auth-copy">
+            <p class="eyebrow">Đăng nhập</p>
+            <h1>Truy cập tài khoản của bạn</h1>
+            <p class="hero-text">Nhập đúng email và mật khẩu. Hệ thống sẽ tự nhận diện bạn là người dùng hay quản trị viên dựa trên tài khoản đã được cấp quyền.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="auth-alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="post" class="auth-form">
+            <input type="hidden" name="next" value="{{ next_url }}">
+
+            <label class="auth-label" for="email">Email</label>
+            <input class="auth-input" id="email" name="email" type="email" placeholder="Ví dụ: user@edustore.local" required>
+
+            <label class="auth-label" for="password">Mật khẩu</label>
+            <input class="auth-input" id="password" name="password" type="password" placeholder="Ví dụ: matkhau123" required>
+
+            <button type="submit" class="auth-submit">Đăng nhập</button>
+        </form>
+
+        <div class="auth-hint">
+            <strong>Chưa có tài khoản?</strong>
+            <span><a href="{{ url_for('auth.register', next=next_url) }}" class="secondary-link">Tạo tài khoản người dùng</a></span>
+        </div>
+    </div>
+</section>
+{% endblock %}

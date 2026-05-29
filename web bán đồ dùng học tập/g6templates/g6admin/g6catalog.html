@@ -1,0 +1,139 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<style>
+    .hidden-form { display: none; }
+    .action-cell {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        width: 100%;
+        min-width: 0;
+    }
+    .action-cell a,
+    .action-cell button,
+    .action-cell form {
+        white-space: nowrap;
+    }
+    .action-cell button.secondary-link {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<div class="admin-panel-grid">
+    <section class="white-box admin-panel">
+        <div class="admin-section-head"><div><p class="eyebrow">Danh mục và thương hiệu</p><h3>Quản trị dữ liệu nền</h3></div></div>
+        <div class="admin-split">
+            <form method="post" action="{{ url_for('admin.create_category') }}" class="admin-form" id="createCategoryForm">
+                <h4 id="categoryFormTitle">Thêm danh mục</h4>
+                <input class="auth-input" id="categoryId" name="category_id" type="hidden">
+                <input class="auth-input" name="category_name" type="text" placeholder="Ví dụ: Dụng cụ thí nghiệm" required>
+                <input class="auth-input" name="slug" type="text" placeholder="Ví dụ: dung-cu-thi-nghiem" required>
+                <input class="auth-input" name="description" type="text" placeholder="Mô tả ngắn">
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" class="btn-inline" id="categorySaveBtn">Lưu danh mục</button>
+                    <button type="button" class="btn-inline hidden-form" id="categoryCancelBtn" onclick="resetCategoryForm()" style="background: #999;">Hủy</button>
+                </div>
+            </form>
+            <form method="post" action="{{ url_for('admin.create_brand') }}" class="admin-form" id="createBrandForm">
+                <h4 id="brandFormTitle">Thêm thương hiệu</h4>
+                <input class="auth-input" id="brandId" name="brand_id" type="hidden">
+                <input class="auth-input" name="brand_name" type="text" placeholder="Ví dụ: Deli" required>
+                <input class="auth-input" name="country" type="text" placeholder="Ví dụ: Việt Nam">
+                <input class="auth-input" name="website" type="text" placeholder="Ví dụ: https://deli.com">
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" class="btn-inline" id="brandSaveBtn">Lưu thương hiệu</button>
+                    <button type="button" class="btn-inline hidden-form" id="brandCancelBtn" onclick="resetBrandForm()" style="background: #999;">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="admin-two-col">
+        <div class="admin-mini-list">
+            <h4>Danh mục hiện có</h4>
+            {% for category in categories %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ category.CategoryName }}</strong>
+                        <p class="muted-line">#{{ category.CategoryID }}</p>
+                    </div>
+                    <div class="action-cell">
+                        <a href="{{ url_for('admin.category_detail', category_id=category.CategoryID) }}" class="secondary-link">Xem chi tiết</a>
+                        <button type="button" class="secondary-link" onclick="editCategory({{ category.CategoryID }}, '{{ category.CategoryName }}', '{{ category.Slug }}', '{{ category.Description or '' }}')">Sửa</button>
+                        <form method="post" action="{{ url_for('admin.delete_category', category_id=category.CategoryID) }}" style="display: inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa danh mục này?');">
+                            <button type="submit" class="btn-inline btn-danger">Xóa</button>
+                        </form>
+                    </div>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+        <div class="admin-mini-list">
+            <h4>Thương hiệu hiện có</h4>
+            {% for brand in brands %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ brand.BrandName }}</strong>
+                        <p class="muted-line">#{{ brand.BrandID }}</p>
+                    </div>
+                    <div class="action-cell">
+                        <a href="{{ url_for('admin.brand_detail', brand_id=brand.BrandID) }}" class="secondary-link">Xem chi tiết</a>
+                        <button type="button" class="secondary-link" onclick="editBrand({{ brand.BrandID }}, '{{ brand.BrandName }}', '{{ brand.Country or '' }}', '{{ brand.Website or '' }}')">Sửa</button>
+                        <form method="post" action="{{ url_for('admin.delete_brand', brand_id=brand.BrandID) }}" style="display: inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa thương hiệu này?');">
+                            <button type="submit" class="btn-inline btn-danger">Xóa</button>
+                        </form>
+                    </div>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<script>
+function editCategory(id, name, slug, description) {
+    document.getElementById('categoryId').value = id;
+    document.getElementById('createCategoryForm').action = '/admin/categories/' + id + '/update';
+    document.querySelector('#createCategoryForm input[name="category_name"]').value = name;
+    document.querySelector('#createCategoryForm input[name="slug"]').value = slug;
+    document.querySelector('#createCategoryForm input[name="description"]').value = description;
+    document.getElementById('categoryFormTitle').textContent = 'Sửa danh mục';
+    document.getElementById('categorySaveBtn').textContent = 'Cập nhật danh mục';
+    document.getElementById('categoryCancelBtn').classList.remove('hidden-form');
+}
+
+function resetCategoryForm() {
+    document.getElementById('categoryId').value = '';
+    document.getElementById('createCategoryForm').action = "{{ url_for('admin.create_category') }}";
+    document.getElementById('createCategoryForm').reset();
+    document.getElementById('categoryFormTitle').textContent = 'Thêm danh mục';
+    document.getElementById('categorySaveBtn').textContent = 'Lưu danh mục';
+    document.getElementById('categoryCancelBtn').classList.add('hidden-form');
+}
+
+function editBrand(id, name, country, website) {
+    document.getElementById('brandId').value = id;
+    document.getElementById('createBrandForm').action = '/admin/brands/' + id + '/update';
+    document.querySelector('#createBrandForm input[name="brand_name"]').value = name;
+    document.querySelector('#createBrandForm input[name="country"]').value = country;
+    document.querySelector('#createBrandForm input[name="website"]').value = website;
+    document.getElementById('brandFormTitle').textContent = 'Sửa thương hiệu';
+    document.getElementById('brandSaveBtn').textContent = 'Cập nhật thương hiệu';
+    document.getElementById('brandCancelBtn').classList.remove('hidden-form');
+}
+
+function resetBrandForm() {
+    document.getElementById('brandId').value = '';
+    document.getElementById('createBrandForm').action = "{{ url_for('admin.create_brand') }}";
+    document.getElementById('createBrandForm').reset();
+    document.getElementById('brandFormTitle').textContent = 'Thêm thương hiệu';
+    document.getElementById('brandSaveBtn').textContent = 'Lưu thương hiệu';
+    document.getElementById('brandCancelBtn').classList.add('hidden-form');
+}
+</script>
+{% endblock %}

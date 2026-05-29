@@ -1,0 +1,66 @@
+﻿{% extends "g6base.html" %}
+
+{% block content %}
+
+<section class="section-heading">
+    <div>
+        <p class="eyebrow">Ưu đãi hôm nay</p>
+        <h2>Sản phẩm khuyến mại</h2>
+    </div>
+</section>
+
+<section class="promo-shell">
+    {% if promotional_products %}
+        <div class="promo-carousel" id="promo-carousel">
+            <div class="promo-carousel-track" id="promo-carousel-track">
+                {% for product in promotional_products %}
+                    <a href="{{ url_for('site.product_detail', product_id=product.ProductID) }}" class="promo-banner {% if loop.first %}active{% endif %}">
+                        <div class="promo-banner-media {{ '' if product.ImageURL else 'image-missing' }}">
+                            {% if product.ImageURL %}
+                                <img src="{{ product.ImageURL }}" alt="{{ product.ProductName }}" class="product-image" loading="lazy">
+                            {% endif %}
+                            <div class="product-placeholder">EduStore</div>
+                        </div>
+                        <div class="promo-banner-overlay">
+                            <span class="promo-badge">{{ product.PromotionCode or "Ưu đãi" }}</span>
+                            <p class="eyebrow">Sản phẩm nổi bật</p>
+                            <h3>{{ product.ProductName }}</h3>
+                            {% if product.PromotionText %}
+                                <p class="promo-banner-text">{{ product.PromotionText }}</p>
+                            {% endif %}
+                            <div class="promo-banner-price">{{ "{:,.0f}".format(product.Price) }}đ</div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+            <button type="button" class="promo-nav promo-prev" onclick="movePromoSlide(-1)" aria-label="Xem banner trước">&#10094;</button>
+            <button type="button" class="promo-nav promo-next" onclick="movePromoSlide(1)" aria-label="Xem banner tiếp theo">&#10095;</button>
+            <div class="promo-dots">
+                {% for product in promotional_products %}
+                    <button type="button" class="promo-dot {% if loop.first %}active{% endif %}" onclick="goToPromoSlide({{ loop.index0 }})" aria-label="Chuyển tới banner {{ loop.index }}"></button>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <p class="empty-msg">Hiện chưa có sản phẩm khuyến mại nào đang hiển thị.</p>
+    {% endif %}
+</section>
+
+<section class="section-heading">
+    <div>
+        <p class="eyebrow">Danh sách sản phẩm</p>
+        <h2>Chọn nhanh những món đồ bạn cần cho buổi học tiếp theo</h2>
+    </div>
+    <a class="secondary-link" href="/cart">Xem giỏ hàng</a>
+</section>
+
+<main>
+    <div id="products" class="product-grid"></div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof loadProducts === "function") loadProducts();
+    });
+</script>
+{% endblock %}

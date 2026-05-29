@@ -1,0 +1,114 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<style>
+    .action-cell {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        width: 100%;
+        min-width: 0;
+    }
+    .action-cell a,
+    .action-cell button,
+    .action-cell form {
+        white-space: nowrap;
+    }
+</style>
+
+<div class="admin-panel-grid">
+    <section class="white-box admin-panel">
+        <div class="admin-section-head">
+            <div>
+                <p class="eyebrow">Quyền quản trị</p>
+                <h3>Yêu cầu xin lên quản trị viên</h3>
+            </div>
+        </div>
+        {% if admin_requests %}
+            <div class="admin-table">
+                <table>
+                    <thead>
+                        <tr><th>Tài khoản</th><th>Email</th><th>Thao tác</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for account in admin_requests %}
+                            <tr>
+                                <td>{{ account.FullName }}</td>
+                                <td>{{ account.Email }}</td>
+                                <td class="action-cell">
+                                    <a href="{{ url_for('admin.account_detail', account_id=account.AccountID) }}" class="secondary-link">Xem chi tiết</a>
+                                    {% if can_manage_admin_roles %}
+                                        <form method="post" action="{{ url_for('admin.approve_admin_request', account_id=account.AccountID) }}"><button type="submit" class="btn-inline">Duyệt</button></form>
+                                        <form method="post" action="{{ url_for('admin.reject_admin_request', account_id=account.AccountID) }}"><button type="submit" class="btn-inline btn-danger">Từ chối</button></form>
+                                    {% else %}
+                                        <span class="muted-line">Chỉ quản trị viên chính được xử lý</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>Hiện chưa có yêu cầu mới.</p>
+        {% endif %}
+        {% if not can_manage_admin_roles %}
+            <p class="muted-line">Bạn đang là quản trị viên thường. Quyền cấp quản trị cho tài khoản khác chỉ thuộc về quản trị viên chính.</p>
+        {% endif %}
+    </section>
+
+    <section class="white-box admin-panel">
+        <div class="admin-section-head">
+            <div>
+                <p class="eyebrow">Tài khoản</p>
+                <h3>Quản lý user và admin</h3>
+            </div>
+        </div>
+        <div class="admin-table">
+            <table>
+                <thead>
+                    <tr><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                </thead>
+                <tbody>
+                    {% for account in accounts %}
+                        <tr>
+                            <td>{{ account.FullName }}</td>
+                            <td>{{ account.Email }}</td>
+                            <td>
+                                {{ account.Role }}
+                                {% if account.IsPrimaryAdmin %}
+                                    <strong class="admin-primary-badge">Chính</strong>
+                                {% endif %}
+                            </td>
+                            <td>{{ 'Hoạt động' if account.IsActive else 'Khoá' }}</td>
+                            <td class="action-cell account-action-stack">
+                                <a href="{{ url_for('admin.account_detail', account_id=account.AccountID) }}" class="secondary-link">Xem chi tiết</a>
+                                {% if can_manage_admin_roles and not account.IsPrimaryAdmin %}
+                                    <form method="post" action="{{ url_for('admin.set_account_role', account_id=account.AccountID) }}" class="inline-form">
+                                        <select class="admin-select" name="role">
+                                            <option value="user" {% if account.Role == 'user' %}selected{% endif %}>user</option>
+                                            <option value="admin" {% if account.Role == 'admin' %}selected{% endif %}>admin</option>
+                                        </select>
+                                        <button type="submit" class="btn-inline">Đổi quyền</button>
+                                    </form>
+                                {% elif account.IsPrimaryAdmin %}
+                                    <span class="muted-line">Tài khoản quản trị viên chính</span>
+                                {% endif %}
+                                {% if account.Role != 'admin' %}
+                                    <form method="post" action="{{ url_for('admin.toggle_account', account_id=account.AccountID) }}">
+                                        <button type="submit" class="btn-inline">{{ 'Khoá' if account.IsActive else 'Mở khoá' }}</button>
+                                    </form>
+                                {% else %}
+                                    <span class="muted-line">Tài khoản admin không bị khoá</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

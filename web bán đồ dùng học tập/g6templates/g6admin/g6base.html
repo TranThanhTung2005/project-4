@@ -1,0 +1,34 @@
+﻿{% extends "g6base.html" %}
+
+{% block content %}
+<section class="admin-shell">
+    <div class="admin-header">
+        <div>
+            <p class="eyebrow">Quản trị web</p>
+            <h1 class="cart-title">Khu quản trị EduStore</h1>
+        </div>
+        <a href="/" class="secondary-link">Xem giao diện người dùng</a>
+    </div>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <nav class="admin-nav">
+                <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link {{ 'active' if admin_section == 'dashboard' else '' }}">Tổng quan</a>
+                <a href="{{ url_for('admin.accounts_page') }}" class="admin-nav-link {{ 'active' if admin_section == 'accounts' else '' }}">Tài khoản</a>
+                <a href="{{ url_for('admin.products_page') }}" class="admin-nav-link {{ 'active' if admin_section == 'products' else '' }}">Sản phẩm</a>
+                <a href="{{ url_for('admin.orders_page') }}" class="admin-nav-link {{ 'active' if admin_section == 'orders' else '' }}">Đơn hàng</a>
+                <a href="{{ url_for('admin.catalog_page') }}" class="admin-nav-link {{ 'active' if admin_section == 'catalog' else '' }}">Danh mục</a>
+                <a href="{{ url_for('admin.promotions_page') }}" class="admin-nav-link {{ 'active' if admin_section == 'promotions' else '' }}">Khuyến mãi</a>
+                <a href="{{ url_for('admin.employees_page') }}" class="admin-nav-link {{ 'active' if admin_section == 'employees' else '' }}">Nhân viên</a>
+                <a href="{{ url_for('admin.suppliers_page') }}" class="admin-nav-link {{ 'active' if admin_section == 'suppliers' else '' }}">Nhà cung cấp</a>
+                <a href="{{ url_for('admin.users_page') }}" class="admin-nav-link {{ 'active' if admin_section == 'users' else '' }}">Người dùng</a>
+            </nav>
+        </aside>
+
+        <div class="admin-main">
+            {% block admin_content %}{% endblock %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+

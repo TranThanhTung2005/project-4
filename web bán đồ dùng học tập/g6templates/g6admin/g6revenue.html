@@ -1,0 +1,122 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="admin-overview-hero">
+    <div class="white-box admin-panel">
+        <div class="admin-section-head">
+            <div>
+                <p class="eyebrow">Doanh thu</p>
+                <h2 class="admin-overview-title">Quản lý doanh thu hệ thống</h2>
+                <p class="hero-text">Theo dõi tổng doanh thu, doanh thu đã giao thành công và các đơn đang nằm trong pipeline xử lý.</p>
+            </div>
+            <a href="{{ url_for('admin.orders_page') }}" class="secondary-link">Xem đơn hàng</a>
+        </div>
+        <div class="admin-metrics admin-metrics-hero admin-metrics-revenue">
+            <article class="metric-card metric-card-highlight">
+                <span class="stat-label">Tổng doanh thu</span>
+                <strong>{{ "{:,.0f}".format(revenue_summary.TotalRevenue if revenue_summary else 0) }}đ</strong>
+                <p class="muted-line">Tính trên toàn bộ đơn chưa huỷ</p>
+            </article>
+            <article class="metric-card">
+                <span class="stat-label">Đã giao</span>
+                <strong>{{ "{:,.0f}".format(revenue_summary.DeliveredRevenue if revenue_summary else 0) }}đ</strong>
+                <p class="muted-line">Doanh thu đã hoàn tất</p>
+            </article>
+            <article class="metric-card">
+                <span class="stat-label">Đang xử lý</span>
+                <strong>{{ "{:,.0f}".format(revenue_summary.PipelineRevenue if revenue_summary else 0) }}đ</strong>
+                <p class="muted-line">Đơn pending, confirmed, shipping</p>
+            </article>
+            <article class="metric-card">
+                <span class="stat-label">Đơn tạo doanh thu</span>
+                <strong>{{ revenue_summary.RevenueOrders if revenue_summary else 0 }}</strong>
+                <p class="muted-line">Số đơn chưa bị huỷ</p>
+            </article>
+        </div>
+    </div>
+
+    <aside class="white-box admin-panel admin-overview-side">
+        <p class="eyebrow">Tóm tắt nhanh</p>
+        <div class="admin-quick-list">
+            {% for item in revenue_by_status %}
+                <div class="admin-quick-item">
+                    <span class="admin-quick-number">{{ item.OrderCount }}</span>
+                    <div>
+                        <strong>{{ item.OrderStatus }}</strong>
+                        <p class="muted-line">{{ "{:,.0f}".format(item.Revenue) }}đ</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </aside>
+</section>
+
+<div class="admin-two-col">
+    <section class="white-box admin-panel">
+        <div class="admin-section-head">
+            <div>
+                <p class="eyebrow">Theo tháng</p>
+                <h3>Doanh thu 6 kỳ gần nhất</h3>
+            </div>
+        </div>
+        {% if monthly_revenue %}
+            <div class="revenue-chart">
+                {% for month in monthly_revenue|reverse %}
+                    <article class="revenue-bar-card">
+                        <div class="revenue-bar-shell">
+                            <div
+                                class="revenue-bar-fill"
+                                style="height: {{ ((month.Revenue / revenue_chart_max) * 100) if revenue_chart_max else 0 }}%;"
+                                title="{{ '{:,.0f}'.format(month.Revenue) }}đ"
+                            ></div>
+                        </div>
+                        <strong>{{ "{:,.0f}".format(month.Revenue) }}đ</strong>
+                        <span>Th{{ month.RevenueMonth }}/{{ month.RevenueYear }}</span>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="admin-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kỳ</th>
+                        <th>Số đơn</th>
+                        <th>Doanh thu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for month in monthly_revenue %}
+                        <tr>
+                            <td>Tháng {{ month.RevenueMonth }}/{{ month.RevenueYear }}</td>
+                            <td>{{ month.OrderCount }}</td>
+                            <td>{{ "{:,.0f}".format(month.Revenue) }}đ</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="white-box admin-panel">
+        <div class="admin-section-head">
+            <div>
+                <p class="eyebrow">Theo trạng thái</p>
+                <h3>Phân bổ đơn hàng và doanh thu</h3>
+            </div>
+        </div>
+        <div class="admin-mini-list">
+            {% for item in revenue_by_status %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ item.OrderStatus }}</strong>
+                        <p class="muted-line">{{ item.OrderCount }} đơn</p>
+                    </div>
+                    <strong>{{ "{:,.0f}".format(item.Revenue) }}đ</strong>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

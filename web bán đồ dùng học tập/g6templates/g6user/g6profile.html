@@ -1,0 +1,86 @@
+﻿{% extends "g6base.html" %}
+
+{% block content %}
+<section class="section-heading">
+    <div>
+        <p class="eyebrow">Tài khoản</p>
+        <h2>Hồ sơ cá nhân</h2>
+    </div>
+    <a href="{{ url_for('site.order_history') }}" class="secondary-link">Xem lịch sử đơn hàng</a>
+</section>
+
+<section class="product-detail-grid">
+    <div class="white-box detail-panel">
+        <div class="admin-section-head">
+            <div>
+                <p class="eyebrow">Cập nhật thông tin</p>
+                <h3>Thông tin người dùng</h3>
+            </div>
+        </div>
+        <form method="post" class="admin-form">
+            <input type="text" name="full_name" class="auth-input" value="{{ customer.FullName }}" placeholder="Nhập họ tên" required>
+            <input type="email" class="auth-input" value="{{ customer.Email }}" disabled>
+            <input type="text" name="phone" class="auth-input" value="{{ customer.Phone or '' }}" placeholder="Nhập số điện thoại">
+            <textarea name="address" class="auth-input detail-textarea" placeholder="Nhập địa chỉ">{{ customer.Address or '' }}</textarea>
+            <button type="submit" class="btn-inline">Lưu thông tin</button>
+        </form>
+    </div>
+
+    <div class="detail-side">
+        <section class="white-box detail-panel">
+            <div class="admin-section-head">
+                <div>
+                    <p class="eyebrow">Tài khoản hiện tại</p>
+                    <h3>{{ current_user.name }}</h3>
+                </div>
+            </div>
+            <div class="admin-mini-list">
+                <div class="linked-row">
+                    <div>
+                        <strong>Email</strong>
+                        <p class="muted-line">{{ customer.Email }}</p>
+                    </div>
+                </div>
+                <hr class="admin-divider">
+                <div class="linked-row">
+                    <div>
+                        <strong>Vai trò</strong>
+                        <p class="muted-line">{{ "Quản trị viên" if current_user.role == "admin" else "Người dùng" }}</p>
+                    </div>
+                </div>
+                <hr class="admin-divider">
+                <div class="linked-row">
+                    <div>
+                        <strong>Ngày tạo</strong>
+                        <p class="muted-line">{{ customer.CreatedAt }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="white-box detail-panel">
+            <div class="admin-section-head">
+                <div>
+                    <p class="eyebrow">Đơn gần đây</p>
+                    <h3>{{ recent_orders|length }} đơn mới nhất</h3>
+                </div>
+            </div>
+            {% if recent_orders %}
+                <div class="admin-mini-list">
+                    {% for order in recent_orders %}
+                        <div class="linked-row">
+                            <div>
+                                <strong>Đơn #{{ order.OrderID }}</strong>
+                                <p class="muted-line">{{ order.OrderStatus }} · {{ "{:,.0f}".format(order.FinalAmount) }}đ</p>
+                            </div>
+                        </div>
+                        {% if not loop.last %}<hr class="admin-divider">{% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted-line">Bạn chưa có đơn hàng nào.</p>
+            {% endif %}
+        </section>
+    </div>
+</section>
+{% endblock %}

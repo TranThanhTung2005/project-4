@@ -1,0 +1,25 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết đánh giá</p>
+            <h3>Đánh giá #{{ review.ReviewID }}</h3>
+        </div>
+        <a href="{{ url_for('admin.users_page') }}" class="secondary-link">Quay lại người dùng</a>
+    </div>
+    <div class="detail-meta-grid">
+        <div class="detail-meta-card"><span>Sản phẩm</span><strong>{{ review.ProductName }}</strong></div>
+        <div class="detail-meta-card"><span>Khách hàng</span><strong>{{ review.CustomerName }}</strong></div>
+        <div class="detail-meta-card"><span>Email</span><strong>{{ review.Email }}</strong></div>
+        <div class="detail-meta-card"><span>Số sao</span><strong>{{ review.Rating }}/5</strong></div>
+        <div class="detail-meta-card"><span>Ngày tạo</span><strong>{{ review.CreatedAt }}</strong></div>
+    </div>
+    <p class="detail-description">{{ review.Comment or 'Không có nội dung bình luận.' }}</p>
+    <div class="action-cell">
+        <a href="{{ url_for('admin.product_detail', product_id=review.ProductID) }}" class="secondary-link">Xem sản phẩm</a>
+        <a href="{{ url_for('admin.customer_detail', customer_id=review.CustomerID) }}" class="secondary-link">Xem khách hàng</a>
+    </div>
+</section>
+{% endblock %}

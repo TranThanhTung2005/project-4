@@ -1,0 +1,50 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<style>
+    .action-cell {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        width: 100%;
+        min-width: 0;
+    }
+    .action-cell a,
+    .action-cell button,
+    .action-cell form {
+        white-space: nowrap;
+    }
+</style>
+
+<section class="white-box admin-panel">
+    <div class="admin-section-head"><div><p class="eyebrow">Đơn hàng</p><h3>Cập nhật trạng thái đơn hàng</h3></div></div>
+    <div class="admin-table">
+        <table>
+            <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Tổng</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>#{{ order.OrderID }}</td>
+                        <td>{{ order.CustomerName }}</td>
+                        <td>{{ "{:,.0f}".format(order.TotalAmount) }}đ</td>
+                        <td>{{ order.OrderStatus }}</td>
+                        <td class="action-cell">
+                            <a href="{{ url_for('admin.order_detail', order_id=order.OrderID) }}" class="secondary-link">Xem chi tiết</a>
+                            <form method="post" action="{{ url_for('admin.update_order_status', order_id=order.OrderID) }}" class="inline-form">
+                                <select class="admin-select" name="status">
+                                    {% for status in ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'] %}
+                                        <option value="{{ status }}" {% if status == order.OrderStatus %}selected{% endif %}>{{ status }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn-inline">Lưu</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

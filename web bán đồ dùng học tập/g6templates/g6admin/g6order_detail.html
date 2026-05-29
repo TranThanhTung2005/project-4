@@ -1,0 +1,45 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết đơn hàng</p>
+            <h3>Đơn #{{ order.OrderID }}</h3>
+        </div>
+        <a href="{{ url_for('admin.orders_page') }}" class="secondary-link">Quay lại đơn hàng</a>
+    </div>
+    <div class="detail-meta-grid">
+        <div class="detail-meta-card"><span>Khách hàng</span><strong>{{ order.CustomerName }}</strong></div>
+        <div class="detail-meta-card"><span>Email</span><strong>{{ order.Email }}</strong></div>
+        <div class="detail-meta-card"><span>Điện thoại</span><strong>{{ order.Phone or 'Chưa có' }}</strong></div>
+        <div class="detail-meta-card"><span>Địa chỉ khách hàng</span><strong>{{ order.Address or 'Chưa có' }}</strong></div>
+        <div class="detail-meta-card"><span>Giao tới</span><strong>{{ order.ShippingAddress or 'Chưa có' }}</strong></div>
+        <div class="detail-meta-card"><span>Trạng thái</span><strong>{{ order.OrderStatus }}</strong></div>
+        <div class="detail-meta-card"><span>Tạm tính</span><strong>{{ "{:,.0f}".format(order.TotalAmount) }}đ</strong></div>
+        <div class="detail-meta-card"><span>Giảm giá</span><strong>{{ "{:,.0f}".format(order.Discount or 0) }}đ</strong></div>
+        <div class="detail-meta-card"><span>Thanh toán cuối</span><strong>{{ "{:,.0f}".format(order.FinalAmount) }}đ</strong></div>
+    </div>
+    <p class="detail-description">Ghi chú: {{ order.Note or 'Không có ghi chú.' }}</p>
+</section>
+
+<section class="white-box admin-panel">
+    <div class="admin-section-head"><div><p class="eyebrow">Chi tiết dòng hàng</p><h3>{{ items|length }} sản phẩm trong đơn</h3></div></div>
+    <div class="admin-table">
+        <table>
+            <thead><tr><th>Sản phẩm</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Thao tác</th></tr></thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ item.ProductName }}</td>
+                        <td>{{ item.Quantity }}</td>
+                        <td>{{ "{:,.0f}".format(item.UnitPrice) }}đ</td>
+                        <td>{{ "{:,.0f}".format(item.LineTotal) }}đ</td>
+                        <td><a href="{{ url_for('admin.product_detail', product_id=item.ProductID) }}" class="secondary-link">Xem chi tiết</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

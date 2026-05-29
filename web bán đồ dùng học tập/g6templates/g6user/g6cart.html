@@ -1,0 +1,71 @@
+﻿{% extends "g6base.html" %}
+
+{% block content %}
+<main class="cart-page-wrapper">
+    <section class="cart-hero">
+        <div>
+            <p class="eyebrow">Giỏ hàng</p>
+            <h1 class="cart-title">Hoàn tất lựa chọn cho buổi học tiếp theo</h1>
+            <p class="hero-text">Kiểm tra lại sản phẩm, số lượng và tổng tiền trước khi xác nhận đơn hàng.</p>
+        </div>
+        <a href="/" class="secondary-link">Tiếp tục mua sắm</a>
+    </section>
+
+    <div class="cart-layout">
+        <section id="cart-content-area" class="white-box cart-items-panel"></section>
+
+        <aside id="cart-summary-area" class="white-box cart-summary-panel">
+            <div id="cart-total-price"></div>
+            <div id="checkout-login-notice" class="checkout-login-notice" hidden>
+                <div>
+                    <p class="checkout-login-title">Bạn cần đăng nhập trước khi thanh toán</p>
+                    <p class="checkout-login-text">Đăng nhập để EduStore đồng bộ giỏ hàng, lưu thông tin nhận hàng và tạo đơn cho bạn.</p>
+                </div>
+                <div class="checkout-login-actions">
+                    <a class="checkout-login-primary" href="{{ url_for('auth.login', next=request.path) }}">Đăng nhập</a>
+                    <a class="checkout-login-secondary" href="{{ url_for('auth.register', next=request.path) }}">Đăng ký</a>
+                </div>
+            </div>
+            <div class="checkout-form">
+                <label for="checkout-shipping-address">Địa chỉ nhận hàng</label>
+                <textarea
+                    id="checkout-shipping-address"
+                    class="auth-input checkout-textarea"
+                    rows="3"
+                    placeholder="Nhập địa chỉ giao hàng"
+                ></textarea>
+                <label for="checkout-note">Ghi chú</label>
+                <textarea
+                    id="checkout-note"
+                    class="auth-input checkout-textarea"
+                    rows="2"
+                    placeholder="Ví dụ: giao giờ hành chính"
+                ></textarea>
+                <fieldset class="payment-methods">
+                    <legend>Phương thức thanh toán</legend>
+                    <label class="payment-option">
+                        <input type="radio" name="payment-method" value="cash" checked>
+                        <span>
+                            <strong>Tiền mặt</strong>
+                            <small>Thanh toán khi nhận hàng.</small>
+                        </span>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment-method" value="qr">
+                        <span>
+                            <strong>QR ngân hàng MB</strong>
+                            <small>Hiển thị mã QR chuyển khoản trong 10 phút.</small>
+                        </span>
+                    </label>
+                </fieldset>
+            </div>
+            <div id="qr-payment-panel" class="qr-payment-panel" hidden></div>
+            <button class="btn-checkout-final" onclick="checkout()">Xác nhận thanh toán</button>
+        </aside>
+    </div>
+</main>
+
+<script>
+    window.onload = () => { renderCartPage(); };
+</script>
+{% endblock %}

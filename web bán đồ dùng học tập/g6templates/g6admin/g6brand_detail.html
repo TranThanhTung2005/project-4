@@ -1,0 +1,38 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết thương hiệu</p>
+            <h3>{{ brand.BrandName }}</h3>
+        </div>
+        <a href="{{ url_for('admin.catalog_page') }}" class="secondary-link">Quay lại danh mục</a>
+    </div>
+    <div class="detail-meta-grid">
+        <div class="detail-meta-card"><span>Quốc gia</span><strong>{{ brand.Country or 'Chưa cập nhật' }}</strong></div>
+        <div class="detail-meta-card"><span>Website</span><strong>{{ brand.Website or 'Chưa cập nhật' }}</strong></div>
+        <div class="detail-meta-card"><span>Số sản phẩm</span><strong>{{ products|length }}</strong></div>
+    </div>
+</section>
+
+<section class="white-box admin-panel">
+    <div class="admin-section-head"><div><p class="eyebrow">Sản phẩm liên quan</p><h3>Danh sách sản phẩm theo thương hiệu</h3></div></div>
+    {% if products %}
+        <div class="admin-mini-list">
+            {% for product in products %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ product.ProductName }}</strong>
+                        <p class="muted-line">{{ "{:,.0f}".format(product.Price) }}đ · Còn {{ product.Stock }}</p>
+                    </div>
+                    <a href="{{ url_for('admin.product_detail', product_id=product.ProductID) }}" class="secondary-link">Xem chi tiết</a>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="muted-line">Thương hiệu này chưa có sản phẩm nào.</p>
+    {% endif %}
+</section>
+{% endblock %}

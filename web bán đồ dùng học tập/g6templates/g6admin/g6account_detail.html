@@ -1,0 +1,63 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết tài khoản</p>
+            <h3>{{ account.FullName }}</h3>
+        </div>
+        <a href="{{ url_for('admin.accounts_page') }}" class="secondary-link">Quay lại tài khoản</a>
+    </div>
+    <div class="detail-meta-grid">
+        <div class="detail-meta-card"><span>Email</span><strong>{{ account.Email }}</strong></div>
+        <div class="detail-meta-card">
+            <span>Vai trò</span>
+            <strong>
+                {{ account.Role }}
+                {% if account.IsPrimaryAdmin %}
+                    <span class="admin-primary-badge">Chính</span>
+                {% endif %}
+            </strong>
+        </div>
+        <div class="detail-meta-card"><span>Trạng thái</span><strong>{{ 'Hoạt động' if account.IsActive else 'Đã khoá' }}</strong></div>
+        <div class="detail-meta-card"><span>Yêu cầu admin</span><strong>{{ account.AdminRequestStatus }}</strong></div>
+        <div class="detail-meta-card"><span>Số điện thoại</span><strong>{{ account.Phone or 'Chưa có' }}</strong></div>
+        <div class="detail-meta-card"><span>Địa chỉ</span><strong>{{ account.Address or 'Chưa có' }}</strong></div>
+    </div>
+
+    {% if current_user.is_primary_admin and not account.IsPrimaryAdmin %}
+        <form method="post" action="{{ url_for('admin.set_account_role', account_id=account.AccountID) }}" class="admin-form">
+            <div class="admin-form-row">
+                <select class="admin-select" name="role">
+                    <option value="user" {% if account.Role == 'user' %}selected{% endif %}>user</option>
+                    <option value="admin" {% if account.Role == 'admin' %}selected{% endif %}>admin</option>
+                </select>
+                <button type="submit" class="btn-inline">Cập nhật vai trò</button>
+            </div>
+        </form>
+    {% elif account.IsPrimaryAdmin %}
+        <p class="muted-line">Đây là tài khoản quản trị viên chính nên không thể đổi vai trò.</p>
+    {% endif %}
+</section>
+
+<section class="white-box admin-panel">
+    <div class="admin-section-head"><div><p class="eyebrow">Đơn hàng gần đây</p><h3>{{ orders|length }} đơn liên quan</h3></div></div>
+    {% if orders %}
+        <div class="admin-mini-list">
+            {% for order in orders %}
+                <div class="linked-row">
+                    <div>
+                        <strong>Đơn #{{ order.OrderID }}</strong>
+                        <p class="muted-line">{{ "{:,.0f}".format(order.TotalAmount) }}đ · {{ order.OrderStatus }}</p>
+                    </div>
+                    <a href="{{ url_for('admin.order_detail', order_id=order.OrderID) }}" class="secondary-link">Xem chi tiết</a>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="muted-line">Tài khoản này chưa có đơn hàng nào.</p>
+    {% endif %}
+</section>
+{% endblock %}

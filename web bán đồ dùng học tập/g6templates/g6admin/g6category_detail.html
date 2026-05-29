@@ -1,0 +1,47 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết danh mục</p>
+            <h3>{{ category.CategoryName }}</h3>
+        </div>
+        <a href="{{ url_for('admin.catalog_page') }}" class="secondary-link">Quay lại danh mục</a>
+    </div>
+    <div class="detail-meta-grid">
+        <div class="detail-meta-card"><span>Mã danh mục</span><strong>#{{ category.CategoryID }}</strong></div>
+        <div class="detail-meta-card"><span>Slug</span><strong>{{ category.Slug }}</strong></div>
+        <div class="detail-meta-card"><span>Mô tả</span><strong>{{ category.Description or 'Chưa có mô tả' }}</strong></div>
+    </div>
+</section>
+
+<section class="white-box admin-panel">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Sản phẩm thuộc danh mục</p>
+            <h3>{{ products|length }} sản phẩm</h3>
+        </div>
+    </div>
+    {% if products %}
+        <div class="admin-table">
+            <table>
+                <thead><tr><th>Sản phẩm</th><th>Thương hiệu</th><th>Giá</th><th>Tồn kho</th><th>Thao tác</th></tr></thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td>{{ product.ProductName }}</td>
+                            <td>{{ product.BrandName or 'Chưa có' }}</td>
+                            <td>{{ "{:,.0f}".format(product.Price) }}đ</td>
+                            <td>{{ product.Stock }}</td>
+                            <td><a href="{{ url_for('admin.product_detail', product_id=product.ProductID) }}" class="secondary-link">Xem chi tiết</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="muted-line">Danh mục này chưa có sản phẩm nào.</p>
+    {% endif %}
+</section>
+{% endblock %}

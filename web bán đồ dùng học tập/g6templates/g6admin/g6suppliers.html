@@ -1,0 +1,72 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<div class="admin-panel-grid">
+    <section class="white-box admin-panel">
+        <div class="admin-section-head">
+            <div><p class="eyebrow">Nhà cung cấp</p><h3>Quản lý đối tác cung ứng</h3></div>
+        </div>
+        <form method="post" action="{{ url_for('admin.create_supplier') }}" class="admin-form" id="supplierForm">
+            <h4 id="supplierFormTitle">Thêm nhà cung cấp</h4>
+            <input class="auth-input" name="supplier_name" type="text" placeholder="Nhập tên nhà cung cấp" required>
+            <input class="auth-input" name="contact_name" type="text" placeholder="Nhập người liên hệ">
+            <input class="auth-input" name="email" type="email" placeholder="Nhập email">
+            <input class="auth-input" name="phone" type="text" placeholder="Nhập số điện thoại">
+            <input class="auth-input" name="address" type="text" placeholder="Nhập địa chỉ">
+            <div style="display:flex; gap:8px;">
+                <button type="submit" class="btn-inline" id="supplierSaveBtn">Lưu nhà cung cấp</button>
+                <button type="button" class="btn-inline hidden-form" id="supplierCancelBtn" onclick="resetSupplierForm()" style="background:#999;">Hủy</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="white-box admin-panel">
+        <div class="admin-section-head">
+            <div><p class="eyebrow">Danh sách</p><h3>Nhà cung cấp hiện có</h3></div>
+        </div>
+        <div class="admin-mini-list">
+            {% for supplier in suppliers %}
+                <div class="linked-row">
+                    <div>
+                        <strong>{{ supplier.SupplierName }}</strong>
+                        <p class="muted-line">{{ supplier.ContactName or 'Chưa có người liên hệ' }}</p>
+                        <p class="muted-line">{{ supplier.Phone or 'Chưa có SĐT' }}{% if supplier.Email %} · {{ supplier.Email }}{% endif %}</p>
+                    </div>
+                    <div class="action-cell">
+                        <a href="{{ url_for('admin.supplier_detail', supplier_id=supplier.SupplierID) }}" class="secondary-link">Xem chi tiết</a>
+                        <button type="button" class="secondary-link" onclick="editSupplier({{ supplier.SupplierID }}, {{ supplier.SupplierName|tojson }}, {{ (supplier.ContactName or '')|tojson }}, {{ (supplier.Email or '')|tojson }}, {{ (supplier.Phone or '')|tojson }}, {{ (supplier.Address or '')|tojson }})">Sửa</button>
+                        <form method="post" action="{{ url_for('admin.delete_supplier', supplier_id=supplier.SupplierID) }}" onsubmit="return confirm('Xóa nhà cung cấp này?');">
+                            <button type="submit" class="btn-inline btn-danger">Xóa</button>
+                        </form>
+                    </div>
+                </div>
+                {% if not loop.last %}<hr class="admin-divider">{% endif %}
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<script>
+function editSupplier(id, supplierName, contactName, email, phone, address) {
+    const form = document.getElementById('supplierForm');
+    form.action = '/admin/suppliers/' + id + '/update';
+    form.querySelector('input[name="supplier_name"]').value = supplierName;
+    form.querySelector('input[name="contact_name"]').value = contactName || '';
+    form.querySelector('input[name="email"]').value = email || '';
+    form.querySelector('input[name="phone"]').value = phone || '';
+    form.querySelector('input[name="address"]').value = address || '';
+    document.getElementById('supplierFormTitle').textContent = 'Sửa nhà cung cấp';
+    document.getElementById('supplierSaveBtn').textContent = 'Cập nhật nhà cung cấp';
+    document.getElementById('supplierCancelBtn').classList.remove('hidden-form');
+}
+
+function resetSupplierForm() {
+    const form = document.getElementById('supplierForm');
+    form.action = "{{ url_for('admin.create_supplier') }}";
+    form.reset();
+    document.getElementById('supplierFormTitle').textContent = 'Thêm nhà cung cấp';
+    document.getElementById('supplierSaveBtn').textContent = 'Lưu nhà cung cấp';
+    document.getElementById('supplierCancelBtn').classList.add('hidden-form');
+}
+</script>
+{% endblock %}

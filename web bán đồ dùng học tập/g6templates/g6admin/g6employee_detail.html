@@ -1,0 +1,23 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel detail-shell">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết nhân viên</p>
+            <h2>{{ employee.FullName }}</h2>
+        </div>
+        <a href="{{ url_for('admin.employees_page') }}" class="secondary-link">Quay lại nhân viên</a>
+    </div>
+    <div class="detail-grid">
+        <div class="detail-card"><span>Mã nhân viên</span><strong>#{{ employee.EmployeeID }}</strong></div>
+        <div class="detail-card"><span>Email</span><strong>{{ employee.Email }}</strong></div>
+        <div class="detail-card"><span>Chức vụ</span><strong>{{ employee.Position }}</strong></div>
+        <div class="detail-card"><span>Điện thoại</span><strong>{{ employee.Phone or 'Chưa cập nhật' }}</strong></div>
+        <div class="detail-card"><span>Ngày vào làm</span><strong>{{ employee.HireDate }}</strong></div>
+        <div class="detail-card"><span>Lương</span><strong>{{ "{:,.0f}".format(employee.Salary) }}đ</strong></div>
+        <div class="detail-card"><span>Trạng thái</span><strong>{{ 'Hoạt động' if employee.IsActive else 'Tạm khóa' }}</strong></div>
+        <div class="detail-card"><span>Tạo lúc</span><strong>{{ employee.CreatedAt }}</strong></div>
+    </div>
+</section>
+{% endblock %}

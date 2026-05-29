@@ -1,0 +1,21 @@
+﻿{% extends "g6admin/g6g6base.html" %}
+
+{% block admin_content %}
+<section class="white-box admin-panel detail-shell">
+    <div class="admin-section-head">
+        <div>
+            <p class="eyebrow">Chi tiết nhà cung cấp</p>
+            <h2>{{ supplier.SupplierName }}</h2>
+        </div>
+        <a href="{{ url_for('admin.suppliers_page') }}" class="secondary-link">Quay lại nhà cung cấp</a>
+    </div>
+    <div class="detail-grid">
+        <div class="detail-card"><span>Mã nhà cung cấp</span><strong>#{{ supplier.SupplierID }}</strong></div>
+        <div class="detail-card"><span>Người liên hệ</span><strong>{{ supplier.ContactName or 'Chưa cập nhật' }}</strong></div>
+        <div class="detail-card"><span>Email</span><strong>{{ supplier.Email or 'Chưa cập nhật' }}</strong></div>
+        <div class="detail-card"><span>Điện thoại</span><strong>{{ supplier.Phone or 'Chưa cập nhật' }}</strong></div>
+        <div class="detail-card admin-full-span"><span>Địa chỉ</span><strong>{{ supplier.Address or 'Chưa cập nhật' }}</strong></div>
+        <div class="detail-card"><span>Tạo lúc</span><strong>{{ supplier.CreatedAt }}</strong></div>
+    </div>
+</section>
+{% endblock %}
